@@ -1,0 +1,27 @@
+title = "this was a mistake"
+description = "A blog about software, and whatever else I feel like discussing."
+
+default_language = "en"
+
+
+# The URL the site will be built for
+base_url = "https://jjbarr.github.io"
+
+# Whether to automatically compile all Sass files in the sass directory
+compile_sass = false
+
+# Whether to do syntax highlighting
+# Theme can be customised by setting the `highlight_theme` variable to a theme supported by Zola
+highlight_code = false
+
+# RSS? Yes please
+generate_feed = true
+
+feed_filename = "atom.xml"
+
+# Whether to build a search index to be used later on by a JavaScript library
+build_search_index = false
+
+
+[extra]
+# Put all your custom variables here
