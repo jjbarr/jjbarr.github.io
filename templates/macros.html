@@ -1,5 +1,6 @@
-{% macro icon(name, classes="") %}
-<svg class="feather {{classes}}">
+{% macro icon(name, title, classes="") %}
+<svg class="feather {{classes}}" aria-label="[title]">
+  <title>{{title}}</title>
   <use xlink:href="/fonticons/feather.svg#{{name}}"/>
 </svg>
 {% endmacro icon %}

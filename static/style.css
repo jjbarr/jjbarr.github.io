@@ -37,7 +37,7 @@ body {
 
 header {
     font-size: xx-large;
-    font-family: serif;
+    font-family: sans-serif;
     text-align: center;
     margin: 24px;
 }
@@ -80,7 +80,7 @@ hr.fancy {
 }
 
 hr.fancy:after {
-    content: "☿";
+    content: "☿︎";
     display: inline-block;
     position: relative;
     top: -0.5em;
