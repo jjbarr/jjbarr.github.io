@@ -1,0 +1,5 @@
+{% macro icon(name, classes="") %}
+<svg class="feather {{classes}}">
+  <use xlink:href="/fonticons/feather.svg#{{name}}"/>
+</svg>
+{% endmacro icon %}
