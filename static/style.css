@@ -1,30 +1,57 @@
+/* Solarized colors */
+:root {
+    --sol-bg: #fdf6e3;
+    --sol-bg-highlight: #eee8d5;
+    --sol-secondary: #93a1a1;
+    --sol-primary: #657b83;
+    --sol-emph: #586e75;
+    --sol-yellow: #b58900;
+    --sol-orange: #cb4b16;
+    --sol-red: #dc322f;
+    --sol-magenta: #d33682;
+    --sol-brmagenta: #6c71c4;
+    --sol-blue: #268bd2;
+    --sol-cyan: #2aa198;
+    --sol-green: #859900;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --sol-bg: #002b36;
+        --sol-bg-highlight: #073642;
+        --sol-secondary: #586e75;
+        --sol-primary: #839496;
+        --sol-emph: #93a1a1;
+    }
+}
+
 body {
-    margin: 40pt auto;
+    margin: 40px auto;
     max-width: 80ch;
     line-height: 1.6em;
     font-size: 16px;
-    padding: 0 10pt;
-    background-color: #fdf6e3;
-    color: #657b83;
+    padding: 0 10px;
+    background-color: var(--sol-bg);
+    color: var(--sol-primary);
     font-family: sans-serif;
 }
 
 header {
     font-size: xx-large;
+    font-family: serif;
     text-align: center;
-    margin: 18pt;
+    margin: 24px;
 }
 
 header h1 h2 h3 h4 h5 h6 {
-    color: #586e75; 
+    color: var(--sol-emph);
 }
 
 a:link {
-    color: #268bd2;
+    color: var(--sol-blue);
 }
 
 a:visited {
-    color: #d33682;
+    color: var(--sol-magenta);
 }
 
 nav {
@@ -40,28 +67,43 @@ nav {
 hr {
     display:block;
     height: 2pt;
-    border: 0;
-    border-color: #eee8d5;
-    background-color: #eee8d5
+    border: none;
+    border-color: var(--sol-bg-highlight);
+    background-color: var(--sol-bg-highlight);
 }
 
 /* stolen from Harry Roberts at CSS tricks */
 
 hr.fancy {
     overflow: visible; /* For IE */
-    padding: 0;
-    border: none;
-    background-color: #fdf6e3;
-    border-top: medium double #eee8d5;
     text-align: center;
 }
 
 hr.fancy:after {
-    content: "✶";
+    content: "☿";
     display: inline-block;
     position: relative;
-    top: -0.7em;
+    top: -0.5em;
     font-size: 1.5em;
-    padding: 0 0.25em;
-    background: #fdf6e3
+    padding: 0 /*0.25em;*/;
+    color: var(--sol-secondary);
+    background: var(--sol-bg);
+}
+
+.feather {
+    width: 24px;
+    height: 24px;
+    stroke: var(--sol-primary);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.rss {
+    stroke: var(--sol-orange);
+}
+
+.rss:hover {
+    stroke: var(--sol-emph);
 }
