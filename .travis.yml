@@ -13,6 +13,8 @@ after_success: |
   [ $TRAVIS_BRANCH = code ] &&
   [ $TRAVIS_PULL_REQUEST = false ] &&
   zola build &&
-  sudo pip install ghp-import &&
-  ghp-import -nfl public -b master -m "updated website" &&
+  cd public &&
+  git init &&
+  git add -A &&
+  git commit -m "updated website" &&
   git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git master
