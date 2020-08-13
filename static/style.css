@@ -72,6 +72,13 @@ hr {
     background-color: var(--sol-bg-highlight);
 }
 
+.date {
+    float: right;
+    margin-left: 100%;
+    line-height: 2em;
+    font-style: italic;
+}
+
 /* stolen from Harry Roberts at CSS tricks */
 
 hr.fancy {
