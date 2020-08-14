@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{page.title}}</h1>
+<h1 class="page-title">{{page.title}}</h1>
 <span class=date>{{page.date}}</span>
 <article id="page">
   {{page.content | safe}}
