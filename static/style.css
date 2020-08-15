@@ -1,17 +1,17 @@
 /*fonts*/
 @font-face {
     font-family: 'DejaVu Sans';
-    src: url('/static/fonts/DejaVuSans.ttf');
+    src: url('/fonts/DejaVuSans.ttf');
 }
 
 @font-face {
     font-family: 'DejaVu Sans Mono';
-    src: url('/static/fonts/DejaVuSansMono.ttf');
+    src: url('/fonts/DejaVuSansMono.ttf');
 }
 
 @font-face {
     font-family: 'DejaVu Math TeX Gyre';
-    src: url('/static/fonts/DejaVuMathTeXGyre.tff');
+    src: url('/fonts/DejaVuMathTeXGyre.tff');
 }
 
 /*math*/
