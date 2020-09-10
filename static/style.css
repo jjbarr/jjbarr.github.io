@@ -11,15 +11,13 @@
 
 @font-face {
     font-family: 'DejaVu Math TeX Gyre';
-    src: url('/fonts/DejaVuMathTeXGyre.tff');
+    src: url('/fonts/DejaVuMathTeXGyre.ttf');
 }
 
 /*math*/
-@namespace url('http://www.w3.org/1999/xhtml');
-@namespace m url('http://www.w3.org/1998/Math/MathML');
-
-m|math {
+math {
     font-family: 'DejaVu Math TeX Gyre';
+    line-height: 1em;
 }
 
 /* Solarized colors */
