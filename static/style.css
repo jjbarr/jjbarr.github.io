@@ -59,10 +59,15 @@ body {
 
 pre code {
     font-family: 'DejaVu Sans Mono', monospace;
+    display: inline-block;
+    overflow-x: auto;
+    max-width: 100% !important;
+    min-width: 100% !important;
 }
 
 header {
     font-size: 3em;
+    line-height: 1.1em;
     font-family: sans-serif;
     text-align: center;
     margin: 24px;
@@ -75,18 +80,22 @@ header h1 h2 h3 h4 h5 h6 {
 
 h1.page-title {
     font-size: 2.5em;
+    line-height: 1.1em;
 }
 
 h1 {
     font-size: 2em;
+    line-height: 1.1em;
 }
 
 h2 {
     font-size: 1.5em;
+    line-height: 1.1em;
 }
 
 h3 {
     font-size: 1.2em;
+    line-height: 1.1em;
 }
 
 pre {

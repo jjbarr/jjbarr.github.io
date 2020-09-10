@@ -175,7 +175,8 @@ settings and what compiler you use. Isn't UB fun?
 (By the way, if you need to check for an overflow, here's a way to do it:
 ```c
 int test_for_overflow(int x, int y) {
-    return (y < 0)? (x < (INT_MIN - y)) : (x > (INT_MAX - y));
+    return (y < 0)? (x < (INT_MIN - y)) 
+                  : (x > (INT_MAX - y));
 }
 ```
 I mean, that's probably right. I haven't tested it so don't trust me. GCC also 
