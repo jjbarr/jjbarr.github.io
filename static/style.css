@@ -65,6 +65,10 @@ pre code {
     min-width: 100% !important;
 }
 
+code {
+    color: var(--sol-cyan)
+}
+
 header {
     font-size: 3em;
     line-height: 1.1em;
