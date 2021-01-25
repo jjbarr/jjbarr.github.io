@@ -1,0 +1,194 @@
+/*fonts*/
+@font-face {
+    font-family: 'DejaVu Sans';
+    src: url('/fonts/DejaVuSans.ttf');
+}
+
+@font-face {
+    font-family: 'DejaVu Sans Mono';
+    src: url('/fonts/DejaVuSansMono.ttf');
+}
+
+@font-face {
+    font-family: 'DejaVu Math TeX Gyre';
+    src: url('/fonts/DejaVuMathTeXGyre.ttf');
+}
+
+/*math*/
+math {
+    font-family: 'DejaVu Math TeX Gyre';
+    line-height: 1em;
+}
+
+/* Solarized colors */
+:root {
+    --sol-bg: #fdf6e3;
+    --sol-bg-highlight: #eee8d5;
+    --sol-secondary: #93a1a1;
+    --sol-primary: #657b83;
+    --sol-emph: #586e75;
+    --sol-yellow: #b58900;
+    --sol-orange: #cb4b16;
+    --sol-red: #dc322f;
+    --sol-magenta: #d33682;
+    --sol-brmagenta: #6c71c4;
+    --sol-blue: #268bd2;
+    --sol-cyan: #2aa198;
+    --sol-green: #859900;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --sol-bg: #002b36;
+        --sol-bg-highlight: #073642;
+        --sol-secondary: #586e75;
+        --sol-primary: #839496;
+        --sol-emph: #93a1a1;
+    }
+}
+
+body {
+    margin: 40px auto;
+    max-width: 80ch;
+    line-height: 1.6em;
+    font-size: 16px;
+    padding: 0 10px;
+    background-color: var(--sol-bg);
+    color: var(--sol-primary);
+    font-family: 'DejaVu Sans', sans-serif;
+}
+
+pre code {
+    font-family: 'DejaVu Sans Mono', monospace;
+    display: inline-block;
+    overflow-x: auto;
+    max-width: 100% !important;
+    min-width: 100% !important;
+}
+
+code {
+    color: var(--sol-cyan)
+}
+
+header {
+    font-size: 3em;
+    line-height: 1.1em;
+    font-family: sans-serif;
+    text-align: center;
+    margin: 24px;
+}
+
+header h1 h2 h3 h4 h5 h6 {
+    color: var(--sol-emph);
+    font-weight: bold;
+}
+
+h1.page-title {
+    font-size: 2.5em;
+    line-height: 1.1em;
+}
+
+h1 {
+    font-size: 2em;
+    line-height: 1.1em;
+}
+
+h2 {
+    font-size: 1.5em;
+    line-height: 1.1em;
+}
+
+h3 {
+    font-size: 1.2em;
+    line-height: 1.1em;
+}
+
+pre {
+    padding: 10px;
+    border-radius: 10px;
+}
+
+a:link {
+    color: var(--sol-blue);
+}
+
+a:visited {
+    color: var(--sol-magenta);
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+hr {
+    display:block;
+    height: 2pt;
+    border: none;
+    border-color: var(--sol-bg-highlight);
+    background-color: var(--sol-bg-highlight);
+}
+
+.date {
+    float: right;
+    margin-left: 100%;
+    line-height: 2em;
+    font-style: italic;
+}
+
+/* stolen from Harry Roberts at CSS tricks */
+
+hr.fancy {
+    overflow: visible; /* For IE */
+    text-align: center;
+}
+
+hr.fancy:after {
+    content: "☿︎";
+    display: inline-block;
+    position: relative;
+    top: -0.5em;
+    font-size: 1.5em;
+    padding: 0 /*0.25em;*/;
+    color: var(--sol-secondary);
+    background: var(--sol-bg);
+}
+
+/*footer and icon related*/
+.foot-links {
+    float: right;
+}
+
+a.icon {
+    text-decoration: none;
+}
+
+.feather {
+    width: 24px;
+    height: 24px;
+    stroke: var(--sol-primary);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.feather:hover {
+    stroke: var(--sol-emph);
+}
+
+.mail {
+    stroke: var(--sol-red);
+}
+
+.sellout {
+    stroke: var(--sol-green);
+}
+
+.rss {
+    stroke: var(--sol-orange);
+}
+
+.rss:hover {
+    stroke: var(--sol-emph);
+}

@@ -1,0 +1,1422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+	<title>this was a mistake</title>
+	<subtitle>A blog about software, and whatever else I feel like discussing.</subtitle>
+	<link href="https://jjbarr.github.io/atom.xml" rel="self" type="application/atom+xml"/>
+  <link href="https://jjbarr.github.io"/>
+	<generator uri="https://www.getzola.org/">Zola</generator>
+	<updated>2021-01-25T00:00:00+00:00</updated>
+	<id>https://jjbarr.github.io/atom.xml</id>
+	<entry xml:lang="en">
+		<title>Bitwise Basics</title>
+		<published>2021-01-25T00:00:00+00:00</published>
+		<updated>2021-01-25T00:00:00+00:00</updated>
+		<link href="https://jjbarr.github.io/blog/bitwise/" type="text/html"/>
+		<id>https://jjbarr.github.io/blog/bitwise/</id>
+		<content type="html">&lt;blockquote&gt;
+&lt;p&gt;Candidates &lt;em&gt;do&lt;&#x2F;em&gt; need to know about bits and bytes, at least at the level that
+I&#x27;m outlining here. Otherwise they&#x27;re prone to having an integer-overflow
+error in their code that brings the website down and costs us millions. Or
+spending a week trying to decode a serialized object they&#x27;re debugging. Or
+whatever. Computers don&#x27;t have ten fingers; they have one. So people need to
+know this stuff.&lt;&#x2F;p&gt;
+&lt;p&gt;-Steve Yegge, &amp;quot;The Five Essential Phone-Screen Questions&amp;quot;&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;p&gt;Well, it was true all the way back in 2004 when this article was published
+internally at Amazon, and it&#x27;s still true today. I&#x27;m not a famous ex-google
+engineer with a following of cool and attractive people who will happily listen
+to me talk all day about how Emacs is the greatest text editor in the known
+universe, but I got a UCA job with a university introductory systems course that
+doesn&#x27;t actually teach students bitwise fundamentals. Shine on, you crazy,
+unconventional diamonds.&lt;&#x2F;p&gt;
+&lt;p&gt;So if my professors won&#x27;t do it, I will. Class is now in session, I have a giant
+bird mask on my head, this is fine. With luck, by the end of this post I&#x27;ll be
+able to give you a handle on:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Counting in Binary&lt;&#x2F;li&gt;
+&lt;li&gt;Hexadecimal, and hex-to-binary conversion&lt;&#x2F;li&gt;
+&lt;li&gt;Standard Bitwise Operators&lt;&#x2F;li&gt;
+&lt;li&gt;Setting, clearing, and manipulating bits&lt;&#x2F;li&gt;
+&lt;li&gt;Bitmasks, Bitflags, and the like&lt;&#x2F;li&gt;
+&lt;li&gt;Two&#x27;s Complement&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;But that&#x27;s, like, a lot. So I can only promise to do my best and keep up my
+charming facade of clownish buffoonery lest you all realize I&#x27;m a shameless hack
+before the post ends.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;one-ah-ah-ah&quot;&gt;One! Ah Ah Ah!&lt;&#x2F;h1&gt;
+&lt;p&gt;I learned how to count in binary as a child in the back of a car because my dad
+thought it was a neat party trick. If you&#x27;re not in CS, it&#x27;s basically just a
+neat party trick. If you are in CS, it sorta matters. I don&#x27;t expect anyone to
+be able to just start decoding binary at the drop of a hat, but you need to know
+how it&#x27;s done.&lt;&#x2F;p&gt;
+&lt;p&gt;In base ten, the rightmost number is in the ones place, the next number is in
+the tens place, then the hundreds, and so on. You passed first grade, so I
+probably don&#x27;t need to tell you that. Base two, binary, also works like this,
+but each place increments by powers of two. So the first place is still the
+ones, the second place is the twos, the third is the fours, and so on. The &lt;em&gt;n&lt;&#x2F;em&gt;th
+place is the &lt;em&gt;2^(n-1)&lt;&#x2F;em&gt;&#x27;s place.&lt;&#x2F;p&gt;
+&lt;p&gt;Decoding binary is very simple. If there&#x27;s a one in a given place, add the
+number for that place to the total. Otherwise, don&#x27;t. At the end, that total is
+the number. So &lt;em&gt;1110&lt;&#x2F;em&gt; is 2+4+8=14. Simple, right?&lt;&#x2F;p&gt;
+&lt;p&gt;On paper, we can have as many binary digits as we need to work with. However, in
+computers, most of the time we are operating with a fixed number of binary
+digits (&amp;quot;bit&amp;quot; stands for binary digit, in case you didn&#x27;t know...). A &lt;em&gt;byte&lt;&#x2F;em&gt;
+(usually represented by the &lt;em&gt;char&lt;&#x2F;em&gt; type in C) is eight binary digits. Most
+computers also have a number of bits that they natively operate on: they usually
+support working with numbers with less bits at no cost, but if you go beyond
+this native size, you&#x27;ll start incurring additional expenses when you do
+math. This &amp;quot;native size&amp;quot; is known as the &lt;em&gt;word size&lt;&#x2F;em&gt;. Most modern computers have
+a 64-bit word size, although 32-bit word sizes are not uncommon. If you&#x27;re
+running on x86, and particularly on windows, 32 bit numbers are sometimes known
+as &amp;quot;dwords&amp;quot; (&amp;quot;double words&amp;quot;), and 64 bit numbers are sometimes known as &amp;quot;qwords&amp;quot;
+(&amp;quot;quad words&amp;quot;). This does not accurately reflect the word size of the machine
+(which probably &lt;em&gt;is&lt;&#x2F;em&gt; either a dword or a qword), and this terminology is only
+used for dumb reasons that would take too long to explain.&lt;&#x2F;p&gt;
+&lt;p&gt;The largest possible number that can be expression in &lt;em&gt;n&lt;&#x2F;em&gt; bits is &lt;em&gt;(2^n)-1&lt;&#x2F;em&gt;. The
+largest 32 bit number is around 4 billion, and the largest 64 bit number
+is... probably big enough. You don&#x27;t really need to know either of these. You
+&lt;em&gt;should&lt;&#x2F;em&gt; know that the largest possible number you can fit in a byte is 255, and
+the largest number that can fit in 16 bits is 65535.&lt;&#x2F;p&gt;
+&lt;p&gt;It can be hard to tell if a number is in binary or just base 10 but only has
+ones and zeroes in it. A common convention is to prefix a binary number with
+&lt;em&gt;0b&lt;&#x2F;em&gt; to signify that it&#x27;s binary. 10 is 10, &lt;em&gt;0b10&lt;&#x2F;em&gt; is 2. (you may also see
+binary numbers prefixed with a percent sign, but this is less common).&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;hexed&quot;&gt;Hexed&lt;&#x2F;h1&gt;
+&lt;p&gt;Binary is cumbersome. Writing in binary is a pain, and you frequently need to
+write a lot of zeroes to get the number you want. It&#x27;s an unnecessary load on
+the programmer. More to the point, C doesn&#x27;t have binary literals. It really,
+really should. But it doesn&#x27;t.&lt;&#x2F;p&gt;
+&lt;p&gt;C &lt;em&gt;does&lt;&#x2F;em&gt;, however, have hex literals. So let&#x27;s talk about hexadecimal, sometimes
+known as base 16. As you might expect, the first place is the ones, then the
+16s, then the... uh... 256es place. Yeah. That. This does, however, mean we need
+16 digits, where our standard numerical system has a mere ten (0-9). Thus, we
+turn to letters: in hex, A is 10, B is 11, C is 12, and so on up to F, which is
+the number 15, and the highest digit.&lt;&#x2F;p&gt;
+&lt;p&gt;So as not to confuse decimal with hex, hex numbers are almost always written
+with the prefix &amp;quot;0x&amp;quot;, which is also the format that C accepts hex numbers in. 10
+is 10, 0x10 is 16. You might also see 0x10 written as 10h. This format is
+accepted by various assemblers, and if you try to use it in C your code won&#x27;t
+compile. But it&#x27;s good to know about if you see it around.&lt;&#x2F;p&gt;
+&lt;p&gt;The lovely, lovely thing about hexadecimal is that each hex digit corresponds to
+&lt;em&gt;exactly&lt;&#x2F;em&gt; four bits. Thus, if you see two hex digits, you know you&#x27;re working
+with a byte. Four signify a 16 bit number, and so on. Unlike binary, you can
+guarantee that if an number fits in a certain number of hex digits, it will fit
+in the corresponding number of bits.&lt;&#x2F;p&gt;
+&lt;p&gt;There are a few hex numbers you should know off the top of your head, and most
+of them have to do with bits. 0x80 is the number 128, and it&#x27;s a byte with only
+the highest bit set. If you can do subtraction, you can deduce that 0x7F
+is 127. This is the largest number that can be expressed in 7 bits, and it&#x27;s a
+byte with every bit &lt;em&gt;except&lt;&#x2F;em&gt; the highest bit set.&lt;&#x2F;p&gt;
+&lt;p&gt;In the general case, it can be useful to look at a hex number and figure out
+what the bit pattern it represents is. Actually, this is a pretty common thing
+to want to do, so you should know how to do it. The trick is to look at each
+digit individually. The bits are represented by the numbers 1, 2, 4,
+and 8. Subtract each in turn from each digit, highest to lowest (starting with
+eight, going to one), ignoring any that would result in a negative number. If
+you could subtract the number without going negative, than that bit is set. For
+example, given the number 0xCF, We can see that 8 can be subtracted from C,
+giving 4, and 4 can be subtracted from 4, giving 0. 2 and 1 can&#x27;t be subtracted
+without going negative. Thus, the two highest bits in the nybble (a nybble is
+the term for four bits) are set. Then we turn to the F, and we don&#x27;t even need
+to decode this: F is the highest hex digit, so all bits must be set. Thus, we
+can determine that 0xCF = 0b11001111.&lt;&#x2F;p&gt;
+&lt;p&gt;You might notice I haven&#x27;t spent a lot of time discussing how to convert hex to
+decimal. That&#x27;s because... well, it really doesn&#x27;t matter very much. If you&#x27;re
+looking at hex values, the decimal value of the number is probably not super
+relevant to you. Hex is the language programmers use to quickly write down bit
+patterns, or pointers, or things like that. If I&#x27;m talking about how internal
+device memory extends from 0x0000 to 0x07FF (a whopping 2 kilobytes!), I don&#x27;t
+care what 0x07FF is in decimal (it&#x27;s 2047, for reference), I care that it&#x27;s the
+largest value in internal device memory, and if I see a pointer to 0x0800,
+that&#x27;s pointing at something above internal memory (in the case of the random
+machine I chose as an example, the NES, device memory is mapped three times and
+memory location 0x0800 is equivalent to memory location 0x0000, but that doesn&#x27;t
+matter). If you really need to know the decimal value of a hex number (because
+you&#x27;re looking at a value in a debugger that you think is the size of an array
+and you want to see if it&#x27;s too big, for example), your debugger, programmer&#x27;s
+calculator, or nearest python interpreter has tools to help you. Don&#x27;t bother
+trying to convert by hand.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;complementary-my-dear-watson&quot;&gt;Complementary, My Dear Watson&lt;&#x2F;h1&gt;
+&lt;p&gt;Before we get into bitwise operations, I need to take a diversion, and talk
+about two&#x27;s complement. Thus far, we&#x27;ve dealt entirely with positive number, and
+you may wonder how negative numbers are represented by computers. If we wanted
+to write -255 on paper, we can just stick a minus sign in front
+of 255. Computers do not have that luxury. If a number is eight bits, it&#x27;s eight
+bits, there&#x27;s nowhere to put a minus sign. Over the years, there have been
+various solutions to the problem of representing negative numbers on computers,
+and most of them have been truly terrible. The only two you need to know about
+are sign-magnitude and two&#x27;s-complement. Mostly the second one. But I&#x27;m talking
+about the first one first. Because it&#x27;s easier. And I&#x27;m lazy.&lt;&#x2F;p&gt;
+&lt;p&gt;Sign-magnitude representation is the most obvious way to represent negative
+numbers: Just have the highest bit signal whether the number is positive or
+negative. In order to change the sign, just flip that bit. In order to check
+whether the number is positive or negative, just see if the bit is high. This is
+the method used for floating point numbers (for reasons too complex to get into
+here: floating point is complicated and I don&#x27;t want to explain it. I may also
+lack the capability to do so...). It&#x27;s obvious and intuitive, but there are a
+few problems with it. First off, you now have both positive zero, and negative
+zero (yes, positive and negative zero are distinct and not equal in floating
+point numbers. This has caused bugs). Secondly, you now need special hardware
+because when you subtract 1 from 0 you get 1 with the highest bit set, which is
+not what a normal subtraction circuit does in that situation. And that costs
+money.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;an-aside-overflow-and-underflow&quot;&gt;An aside: Overflow and Underflow&lt;&#x2F;h2&gt;
+&lt;p&gt;Before I explain why two&#x27;s complement is the greatest thing since sliced bread,
+I need to briefly discuss what &lt;em&gt;does&lt;&#x2F;em&gt; happen when you subtract from 0 on a
+non-signed number. You probably already know, but in case you don&#x27;t, it wraps
+around. So if you subtract 1 from zero, all the bits in the entire number become
+1, and you get the highest possible number you can describe in however many bits
+you&#x27;re using. If you add 1 to that number, you get zero. The reason for this is
+a) it&#x27;s convenient, and b) if you&#x27;re combining two numbers of the same bit size
+to get a larger number because the largest number the CPU can handle natively
+isn&#x27;t big enough, this is the correct behavior and you can just use an
+add-with-carry CPU instruction (which most CPUs provide) to finish the
+add. Alright, back to our regularly scheduled programming.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;two-s-complement-what-god-intended&quot;&gt;Two&#x27;s Complement: What God Intended&lt;&#x2F;h2&gt;
+&lt;p&gt;I&#x27;m not sure I can overstate how awesome two&#x27;s complement is. Why? Because I
+never need to &lt;em&gt;think&lt;&#x2F;em&gt; about two&#x27;s complement. Nobody does. It just
+works. Silent, and invisible. Truly great engineering is like janitorial staff:
+it does its job silently, invisibly, and you never need to think about it. Most
+engineering sucks, though, which is why I occasionally need to go swear at
+whatever broken piece of crap developers who neither use nor understand UNIX
+have foisted upon me this week. For god&#x27;s sake, do not bundle an ancient version
+of a dead fork of ffmpeg with your sources that I need to build in order to run
+your piece of garbage. But I digress.&lt;&#x2F;p&gt;
+&lt;p&gt;Two&#x27;s complement works like this: The negative version of the number is zero
+minus the number, using unsigned arithmetic (where the number can&#x27;t be less than
+zero). Negative one is just the highest unsigned number. Negative two is that
+minus one. And so on. It&#x27;s that simple.&lt;&#x2F;p&gt;
+&lt;p&gt;This has some very real benefits that you might not have noticed. Firstly, no
+negative zero: there is only one zero, as god intended. Secondly, arithmetic
+just worked. You don&#x27;t need to do special math to work with numbers that might
+be negative, you can use the same addition and subtraction hardware and
+operations, no changes necessary. Thirdly, like sign-magnitude representation,
+all you need to do to check whether a number is negative is check whether the
+highest bit is set (note, please don&#x27;t be clever and replace &lt;code&gt;x &amp;lt; 0&lt;&#x2F;code&gt; in all your
+code with a test to see if the highest bit of &lt;code&gt;x&lt;&#x2F;code&gt; is set. &lt;code&gt;x &amp;lt; 0&lt;&#x2F;code&gt; is faster in
+basically all cases because CPU designers know that people do it all the time,
+and your compiler might or might not be smart enough to notice the
+equivalence). Fourthly, if you add one to the highest number in two&#x27;s
+complement, it will wrap around to the lowest possible number, given the number
+of bits you&#x27;re using. That might sound bad, and it can be (integer overflow bugs
+have caused real problems), but at least it&#x27;s the same &lt;em&gt;kind&lt;&#x2F;em&gt; of bad that
+happens with unsigned integers. It&#x27;s &lt;em&gt;consistent&lt;&#x2F;em&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;The only difference between two&#x27;s complement and unsigned numbers comes when
+increasing the number of bits: taking an 8-bit number and making it a sixteen
+bit number, for example. With an unsigned number, the eight new bits are just
+zero. With a &lt;em&gt;signed&lt;&#x2F;em&gt; two&#x27;s complement number, if the highest bit of the
+original number is one, all the new bits you&#x27;re adding must also be set to one
+to preserve the value and negativity of the number. This is known as &amp;quot;sign
+extension&amp;quot;.&lt;&#x2F;p&gt;
+&lt;p&gt;As a final note, technically the C standard does not require signed numbers to
+be two&#x27;s complement, because C dates to an era where some machines actually used
+different schemes (The Apollo Guidance Computer, which got us to the moon,
+actually used &lt;em&gt;ones&lt;&#x2F;em&gt; complement arithmetic. Google that later and be
+horrified. Yuck). Thus, if you want to write fully standard-compliant portable
+C, you technically can&#x27;t rely on negatives being two&#x27;s complement. However, only
+the most pedantic of spec lawyers would ever complain about this: basically
+every computer you&#x27;d want to actually run software on uses two&#x27;s complement, and
+it&#x27;s one of the safest assumptions you can possibly make about a machine.&lt;&#x2F;p&gt;
+&lt;p&gt;Right, digression over. Onwards for glory!&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;bitwise-operations-bitfoolish-operations-not-listed&quot;&gt;Bitwise Operations (Bitfoolish operations not listed)&lt;&#x2F;h1&gt;
+&lt;p&gt;Bitwise operations operate directly on bits themselves. They aren&#x27;t arithmetic
+operations: They don&#x27;t really make sense if you think about numbers as... well,
+numbers. Instead, they treat numbers as an array of bits, the size of which is
+determined by the size of the number. You might wonder why this is useful, and
+the answer is that it&#x27;s useful all the time, in the world of C. There are a lot
+of situations where you need an array of boolean values (C technically has the
+&lt;code&gt;bool&lt;&#x2F;code&gt; type, but it didn&#x27;t for well over a decade, and &lt;code&gt;bool&lt;&#x2F;code&gt; is just a renamed
+&lt;code&gt;int&lt;&#x2F;code&gt; or &lt;code&gt;char&lt;&#x2F;code&gt;, so you&#x27;re wasting a ton of space making an array of them...),
+or you need to pack multiple elements of different bit extents together to
+create a type (more often, a type tag). This comes up when serializing to binary
+formats designed for network transmission, where the number of bytes in the
+message can make a real impact, and a variety of other techniques.&lt;&#x2F;p&gt;
+&lt;p&gt;Before I go into the rest, I should note something: For as much as C&#x27;s types are
+more about representation and size rather than anything (because all of them are
+numbers, yes, even characters), they don&#x27;t have a size. &lt;code&gt;int&lt;&#x2F;code&gt; can be 16 bits or
+more. &lt;code&gt;char&lt;&#x2F;code&gt; needs to be &lt;em&gt;at least&lt;&#x2F;em&gt; 8 bits. Sure, &lt;code&gt;int&lt;&#x2F;code&gt; is probably 32 bits, and
+&lt;code&gt;char&lt;&#x2F;code&gt; is &lt;em&gt;probably&lt;&#x2F;em&gt; 8, but if it really matters to your program because you&#x27;re
+doing bit manipulations, and everything will go to hell if your data types
+aren&#x27;t the 32 bits or whatever you&#x27;re expecting, you should be using &lt;code&gt;stdint.h&lt;&#x2F;code&gt;,
+which provides &lt;code&gt;intX_t&lt;&#x2F;code&gt; and &lt;code&gt;uintX_t&lt;&#x2F;code&gt; types, where X is most common sizes in
+bits (8, 16, 32, 64...). These types are &lt;em&gt;guaranteed&lt;&#x2F;em&gt; to be the exact size they
+claim to be (the u prefix indicates an unsigned type. As we&#x27;ll go into, this can
+matter).&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;shifts-one-way-or-another&quot;&gt;Shifts, one way or another&lt;&#x2F;h2&gt;
+&lt;p&gt;The simplest bitwise operation to describe, and one of the few that makes some
+kind of mathematical sense, is the &lt;em&gt;bit shift.&lt;&#x2F;em&gt; Bit shifts work they way they
+sound like the do. The left shift shifts every bit one place to the left,
+inserting a zero at the end. On paper, you can do a left shift by just writing a
+zero after the smallest bit (although in a computer, the largest bit is lost
+because there&#x27;s no longer space for it). The right shift shifts every bit to the
+right, with the smallest bit &amp;quot;falling off&amp;quot; the end. You can do a right shift on
+paper by simply erasing the smallest bit in the number. If you&#x27;re quick, you
+might have realized that a left shift is equivalent to multiplying a number by
+two, and a right shift is equivalent to division by two rounding down. Please
+don&#x27;t use left and right shift in your code for these purposes, the compiler is
+usually smart enough to do it for you if it would make your code faster, and it
+makes your code harder to read. Machines are fast enough now that readability
+matters more than performance about 99% of the time.&lt;&#x2F;p&gt;
+&lt;p&gt;In C, the left shift is the &lt;code&gt;&amp;lt;&amp;lt;&lt;&#x2F;code&gt; operator, and the right shift is the &lt;code&gt;&amp;gt;&amp;gt;&lt;&#x2F;code&gt;
+operator. Both accept an operand on the right hand that determines how far to
+shift: &lt;code&gt;x &amp;lt;&amp;lt; n&lt;&#x2F;code&gt; shifts &lt;code&gt;x&lt;&#x2F;code&gt; &lt;code&gt;n&lt;&#x2F;code&gt; places to the left. There are also the &lt;code&gt;&amp;lt;&amp;lt;=&lt;&#x2F;code&gt; and
+&lt;code&gt;&amp;gt;&amp;gt;=&lt;&#x2F;code&gt; operators, which shift and assign. They work just like &lt;code&gt;+=&lt;&#x2F;code&gt;, &lt;code&gt;-=&lt;&#x2F;code&gt;, &lt;code&gt;*=&lt;&#x2F;code&gt;,
+and &lt;code&gt;&#x2F;=&lt;&#x2F;code&gt;, so I shouldn&#x27;t need to explain that.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;logical-or-arithmetic&quot;&gt;Logical, or Arithmetic&lt;&#x2F;h3&gt;
+&lt;p&gt;There is only one kind of left shift, but there are two kinds of right
+shifts. The one I&#x27;ve described is the &lt;em&gt;logical&lt;&#x2F;em&gt; shift, and it&#x27;s what C does when
+you shift an unsigned number. However, if you shift a &lt;em&gt;signed&lt;&#x2F;em&gt; number, C
+performs an &lt;em&gt;arithmetic&lt;&#x2F;em&gt; shift. The difference is that if the most significant
+bit of the number is one, an arithmetic will shift in &lt;em&gt;ones&lt;&#x2F;em&gt;, not zeroes. Given
+the 8-bit number &lt;code&gt;10000000&lt;&#x2F;code&gt;, a logical right shift yields &lt;code&gt;01000000&lt;&#x2F;code&gt;, and an
+arithmetic right shift yields &lt;code&gt;11000000&lt;&#x2F;code&gt;. Why would you ever want this? Well, if
+you&#x27;re working with a signed negative two&#x27;s complement number, the arithmetic
+right shift correctly divides by two, giving you the negative result you
+expect. However, as we&#x27;ve established, most of the time you&#x27;re probably not
+going to be using shifts for math. So make sure to make any number you&#x27;re
+shifting for non-arithmetic purposes &lt;code&gt;unsigned&lt;&#x2F;code&gt;, lest you run into unpleasant
+bugs.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;what-use-is-shift&quot;&gt;What use is shift?&lt;&#x2F;h3&gt;
+&lt;p&gt;Shifts have a lot of uses. If there&#x27;s a number embedded into the bits you&#x27;re
+working with that that you need to fish out, bit shifts can bring that number
+down to start of the bit pattern so you can treat it normally. For example, if
+the low three bits of a 16 bit number indicate the type of the value, and the
+top 13 indicate its length, you can shift it three to the right to get that
+length information in a convenient format. This sort of thing shows up a
+surprising amount.&lt;&#x2F;p&gt;
+&lt;p&gt;Another, more common use of shifts is iterating over the bits in a value. For
+example:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; ones &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;for&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint32_t&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; b &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; n&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;b &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;!= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; b &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;gt;&amp;gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;) {
+    ones &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;+=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; b &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;amp; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0x01&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;; 
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;And the end of the loop, &lt;code&gt;ones&lt;&#x2F;code&gt; will contain the number of bits that were set to
+one in &lt;code&gt;n&lt;&#x2F;code&gt;. (We&#x27;ll talk about what the &lt;code&gt;&amp;amp;&lt;&#x2F;code&gt; is doing in just a moment).&lt;&#x2F;p&gt;
+&lt;p&gt;So... yeah. Shifts. Bloody useful.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;and-and-or-bits-un-masked&quot;&gt;AND and OR: Bits (un)masked&lt;&#x2F;h2&gt;
+&lt;p&gt;These are the operations everyone thinks of when they think of bitwise
+operations. Bitwise AND and bitwise OR don&#x27;t have any logical interpretation on
+real numbers. Instead, they act on arrays of booleans. Which... well, binary
+numbers &lt;em&gt;are&lt;&#x2F;em&gt; arrays of booleans. So there you go. But you need to stop thinking
+about numbers, and start thinking about bits.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;or-setting-the-bit&quot;&gt;OR: Setting the bit&lt;&#x2F;h2&gt;
+&lt;p&gt;Bitwise OR (&lt;code&gt;|&lt;&#x2F;code&gt; in C, with assigning variant &lt;code&gt;|=&lt;&#x2F;code&gt;) ORs the bits in each place on
+both sides. It&#x27;s easier to see an example. To make it easy, we&#x27;ll do &lt;code&gt;0x83 | 0x71&lt;&#x2F;code&gt;. In binary, that&#x27;s&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;  1000 0011
+| 0111 0001
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;I took the liberty of inserting spaces in between each nybble (4-bit sequence)
+to make it easier to read. Anyways, written out like this, you can do an OR by
+just ORing each column. Which gives us&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;   1000 0011
+|  0111 0001
+== 1111 0011
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Or in hex, &lt;code&gt;0x83 | 0x71 == 0xF3&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Bitwise OR is most commonly to ensure a bit is set as true, or (even more often)
+to combine bit constants together.&lt;&#x2F;p&gt;
+&lt;p&gt;I should probably explain why bit constants exist. A lot of C functions end up
+looking like this:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;void &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;frobnicate&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;char *&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;quux&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;foo&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;flags)
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;That flags field is the relevant part. Arguments named &amp;quot;flags&amp;quot; are almost
+&lt;em&gt;always&lt;&#x2F;em&gt; a number that is treated as an array of booleans that alter function
+behavior, and the library the function is from will invariably provide constants
+for each defined flag bit. For example, POSIX&#x27;s
+&lt;a href=&quot;https:&#x2F;&#x2F;man7.org&#x2F;linux&#x2F;man-pages&#x2F;man2&#x2F;open.2.html&quot;&gt;open(2)&lt;&#x2F;a&gt; has a flags field
+that you can use to specify how a file might be opened. &lt;code&gt;O_RDONLY&lt;&#x2F;code&gt; opens a file
+read only, and so on. But there are options that can be &lt;em&gt;combined&lt;&#x2F;em&gt;. For example,
+if you want to open a file for writing, and also erase whatever&#x27;s in it before
+writing anything, you&#x27;ll need to set both &lt;code&gt;O_WRONLY&lt;&#x2F;code&gt; and &lt;code&gt;O_TRUNC&lt;&#x2F;code&gt;. Which you
+can do by simply specifying... &lt;code&gt;O_WRONLY | O_TRUNC&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;By the way, if you want to have a flags argument yourself, you would build the
+constants like this:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;#define FROB_NOSTRANGERS &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0x01
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;#define FROB_TOLOVE &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0x02
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;#define FROB_YOUKNOW &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0x04
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;#define FROB_THERULES &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0x08
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;#define FROB_ANDSO &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0x10
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;#define FROB_DOI &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0x20
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;and so on. 1, 2, 4, and 8 &lt;em&gt;are&lt;&#x2F;em&gt; the bits in hex, after all... You can also use
+an &lt;code&gt;enum&lt;&#x2F;code&gt; instead of &lt;code&gt;#define&lt;&#x2F;code&gt;s. Either is fine.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;and-the-powerhouse-operator&quot;&gt;AND: The powerhouse operator&lt;&#x2F;h2&gt;
+&lt;p&gt;Bitwise AND (&lt;code&gt;&amp;amp;&lt;&#x2F;code&gt; in C, with assigning variant &lt;code&gt;&amp;amp;=&lt;&#x2F;code&gt;) works just like bitwise
+OR... except it&#x27;s an and. To use the same example (&lt;code&gt;0x83 &amp;amp; 0x71&lt;&#x2F;code&gt;) again:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;   1000 0011
+&amp;amp;  0111 0001
+== 0000 0001
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Very simple.&lt;&#x2F;p&gt;
+&lt;p&gt;So, what&#x27;s bitwise AND used for? The most obvious usage to check for the
+presence of flags. When you&#x27;re inside &lt;code&gt;frobnicate&lt;&#x2F;code&gt; and need to check for the
+&lt;code&gt;FROB_NOSTRANGERS&lt;&#x2F;code&gt; flag to decide whether or not to initiate the NOSTRANGERS
+protocol or whatever, you can do this:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;if&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(flags &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;amp;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; FROB_NOSTRANGERS) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;no strangers!
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;However, bitwise AND has a ton of uses. You can use it to cap the range of a
+number to a certain set of bits, for example: &lt;code&gt;n &amp;amp; 0x0F&lt;&#x2F;code&gt; yields only the first
+four bits of &lt;code&gt;n&lt;&#x2F;code&gt;, with all others cleared. This is why the right-hand side
+argument to &lt;code&gt;&amp;amp;&lt;&#x2F;code&gt; is sometimes known as a &amp;quot;bitmask&amp;quot;.&lt;&#x2F;p&gt;
+&lt;p&gt;You can also use &lt;code&gt;&amp;amp;&lt;&#x2F;code&gt; to clear a bit, like you can use &lt;code&gt;|&lt;&#x2F;code&gt; to set it. But you
+need another operator...&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;i-just-love-complements&quot;&gt;I just love complements!&lt;&#x2F;h2&gt;
+&lt;p&gt;&lt;code&gt;~&lt;&#x2F;code&gt;: The bitwise complement, sometimes called bitwise not. This is that rarest
+of things, a unary bitwise operator. All it does is flip all the bits in a given
+number. &lt;code&gt;~0b10110000 == 0b01001111&lt;&#x2F;code&gt; (this isn&#x27;t legal C, C doesn&#x27;t have binary
+literals). Dead simple.&lt;&#x2F;p&gt;
+&lt;p&gt;The most common use of bitwise complement, in combination with bitwise or, is
+clearing flags. If you want to clear &lt;code&gt;FROB_NOSTRANGERS&lt;&#x2F;code&gt;, you can write &lt;code&gt;flags &amp;amp;= ~FROB_NOSTRANGERS&lt;&#x2F;code&gt;, which masks off that specific bit and leaves all other bits
+unaltered.&lt;&#x2F;p&gt;
+&lt;p&gt;We&#x27;re almost through with this. There&#x27;s just one bitwise operator
+left. But... oh boy. It&#x27;s doozy.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;this-xor-that&quot;&gt;This XOR that&lt;&#x2F;h2&gt;
+&lt;p&gt;&lt;code&gt;^&lt;&#x2F;code&gt;, bitwise XOR (eXclusive OR, pronounced &amp;quot;zoar&amp;quot; by me, and apparently
+pronounced &amp;quot;ecks-or&amp;quot; by the rest of the universe), is the most complicated
+operator I&#x27;ll discuss. And I&#x27;m not going to be anywhere &lt;em&gt;close&lt;&#x2F;em&gt; to
+comprehensive. XOR, in short, is &amp;quot;one or the other, but not both&amp;quot;. To use our
+example one more time:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;   1000 0011
+^  0111 0001
+== 1111 0010
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;So... yeah. XOR has a &lt;em&gt;ton&lt;&#x2F;em&gt; of properties. If you have the result of XORing two
+numbers and feed in one of the numbers you used, you&#x27;ll get the other
+number. This is a key element of some ciphers, like AES. XOR is also commonly
+used as part of pseudorandom number generation algorithms, can be used aggregate
+numerous random sources to ensure randomness in a system entropy pool (in
+hardware random number generators). The xor instruction on CPUs is frequently
+used to quickly zero out registers. It&#x27;s fundamental to implement CRC, a common
+and fast checksum algorithm that&#x27;s used in a lot of networking protocols to
+ensure accuracy of transmission. It&#x27;s &lt;em&gt;everywhere&lt;&#x2F;em&gt;. But I don&#x27;t have a ton of
+specific examples like I did before.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;mission-accomplished&quot;&gt;Mission Accomplished&lt;&#x2F;h1&gt;
+&lt;p&gt;Well, I think that&#x27;s pretty much everything, anyways. Or enough of it. Of
+course, there&#x27;s more. There&#x27;s always more. But I can&#x27;t teach you everything. Go
+pick up a book, or get hacking yourself.&lt;&#x2F;p&gt;
+&lt;p&gt;Oh, hey, they&#x27;ve updated the curriculum and they&#x27;re teaching bitwise stuff this
+year. Welp!&lt;&#x2F;p&gt;
+&lt;hr class=&quot;fancy&quot; &#x2F;&gt;
+&lt;p&gt;If you feel the inexplicable urge to give me your hard-earned money, you can
+click the dollar sign in the bottom right to toss $5 my way. I&#x27;m not sure I can
+reasonably claim to deserve it, but the option is there.&lt;&#x2F;p&gt;
+</content>
+	</entry>
+	<entry xml:lang="en">
+		<title>Object Oriented Programming: An Introduction</title>
+		<published>2020-10-03T00:00:00+00:00</published>
+		<updated>2020-10-03T00:00:00+00:00</updated>
+		<link href="https://jjbarr.github.io/blog/oo/" type="text/html"/>
+		<id>https://jjbarr.github.io/blog/oo/</id>
+		<content type="html">&lt;p&gt;Yeah, I know I haven&#x27;t gotten back to Vulkan. Sorry. Someday soon, I promise.&lt;&#x2F;p&gt;
+&lt;p&gt;I hate Java. Like, so much. I understand why it exists, but it&#x27;s just an
+embodiment of what I hate about programming. It&#x27;s overly complex, and it feels
+like it&#x27;s working against you.&lt;&#x2F;p&gt;
+&lt;p&gt;But most of all I resent that, like many young programmers, I was shown Java and
+told, &amp;quot;this is what Object Oriented Programming is, and all good object oriented
+languages are like this.&amp;quot;&lt;&#x2F;p&gt;
+&lt;p&gt;I think this is dishonest, and it&#x27;s not helpful. Object Oriented Programming is
+many things to many people, and to describe Java as the be-all-end-all is
+misleading at best. So today, I want to talk about a very different vision of
+Object Oriented Programming.&lt;&#x2F;p&gt;
+&lt;p&gt;Forget everything you know about OOP, and we can begin.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;it-s-called-oo-for-a-reason&quot;&gt;It&#x27;s called OO for a reason&lt;&#x2F;h1&gt;
+&lt;p&gt;Everyone talks about classes. So I won&#x27;t for now. Classes don&#x27;t matter. &lt;&#x2F;p&gt;
+&lt;p&gt;This is a lie, by the way. Classes do matter, But they&#x27;re not so important as
+you&#x27;d think. In fact, you can have an object-oriented language without
+classes. The most popular OO language without classes is Javascript (&amp;quot;But
+Javascript has classes!&amp;quot; I hear you cry. No, it doesn&#x27;t. It has a keyword called
+&lt;code&gt;class&lt;&#x2F;code&gt; that exists to comfort programmers who are used to classes. Classes in
+Javascript are an illusion. But that&#x27;s a story for another day).&lt;&#x2F;p&gt;
+&lt;p&gt;Object Oriented Programming is about Objects, not Classes. So let&#x27;s take a
+moment to understant what an object really is.&lt;&#x2F;p&gt;
+&lt;p&gt;When explaining objects, most people reach for real-world objects, like chairs
+(no kidding, my first introduction to OO used chairs as an example. Don&#x27;t ever
+do this). This is a bad example. Objects don&#x27;t behave like objects in the real
+world at all. They behave like people. Or maybe like automatons.&lt;&#x2F;p&gt;
+&lt;p&gt;An object is a single, &lt;em&gt;independent&lt;&#x2F;em&gt; actor. Objects are not acted upon. They
+act. They are responsible for themselves. By invoking a method, you are not
+acting on an object, you are &lt;em&gt;requesting&lt;&#x2F;em&gt; that the object. This is more a
+difference in thought from the imperative model (you do a thing to a structure)
+than it is a difference in how things work from your end, but it&#x27;s also more
+accurate to what&#x27;s going on internally, in a sense (we&#x27;ll talk about it). So get
+it through your head.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;a-simple-example&quot;&gt;A Simple Example&lt;&#x2F;h2&gt;
+&lt;p&gt;Let&#x27;s start with the simplest example possible.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;2.
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;code&gt;2&lt;&#x2F;code&gt; is an object. Its class... doesn&#x27;t matter. Don&#x27;t worry about it. If it makes
+you feel better, let&#x27;s say that its class is &lt;code&gt;Integer&lt;&#x2F;code&gt;. Integer defines a set of
+things you can ask an integer to do. You can&#x27;t modify integers in place (you
+can&#x27;t turn two into three, that would be silly...), so all you can ask an
+integer questions of sort. Case in point:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;2 + 2.
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;In Java, you might write this as &lt;code&gt;2.plus(2)&lt;&#x2F;code&gt;. But that&#x27;s awfully inconvenient,
+so I won&#x27;t bother. But the affect is the same. We&#x27;re asking &lt;code&gt;2&lt;&#x2F;code&gt; to tell us what
+&lt;code&gt;Integer&lt;&#x2F;code&gt; it would be if we added the integer &lt;code&gt;2&lt;&#x2F;code&gt; to it. And of course, &lt;code&gt;2&lt;&#x2F;code&gt; will
+tell us that it would be &lt;code&gt;4&lt;&#x2F;code&gt;. We&#x27;ll call this sending &lt;code&gt;2&lt;&#x2F;code&gt; the &lt;em&gt;message&lt;&#x2F;em&gt; &lt;code&gt;+&lt;&#x2F;code&gt;,
+with the &lt;em&gt;argument&lt;&#x2F;em&gt; &lt;code&gt;2&lt;&#x2F;code&gt;. And of course, as any math teacher would tell you:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(2 + 2) = 4.
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;(You might ask why I&#x27;m ending everything with periods. How else would you end a
+sentence? Just because it&#x27;s a sentence for a computer doesn&#x27;t mean I should be
+rude and stop punctuating...)&lt;&#x2F;p&gt;
+&lt;p&gt;Once again, this is just a message. We&#x27;re asking the result of &lt;code&gt;(2 + 2)&lt;&#x2F;code&gt; (&lt;code&gt;4&lt;&#x2F;code&gt;)
+if it&#x27;s equal to another integer, also &lt;code&gt;4&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Naturally, it will answer us by saying&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;true.
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;code&gt;true&lt;&#x2F;code&gt; is an object, too. Although this presents an interesting conundrum: How
+do we figure out that true is true? We can ask it if it&#x27;s true &lt;code&gt;true = true&lt;&#x2F;code&gt;,
+but that&#x27;s not terribly useful, because all it will do is return itself. What
+would be more helpful would be asking true to do a thing if it really is
+true. Something like...&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;true ifTrue: [2] ifFalse: [3].
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Naturally, true will respond with the thing in the first brackets, because true
+is true, and it will tell you &lt;code&gt;2&lt;&#x2F;code&gt;. But what if true was false? &lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;false ifTrue: [2] ifFalse: [3].
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;False also knows how to respond to this request... but it won&#x27;t respond the same
+way &lt;code&gt;true&lt;&#x2F;code&gt; does. It will say &lt;code&gt;3&lt;&#x2F;code&gt;. Because false is false. This seems
+self-evident, but it&#x27;s more useful as things get more complicated:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(1 + 2 * 3 = 7) ifTrue: [&amp;#39;true!&amp;#39;] ifFalse: [&amp;#39;false!&amp;#39;].
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Naturally, this will respond by happily informing us that the answer
+is... &lt;code&gt;&#x27;false!&#x27;&lt;&#x2F;code&gt;. You might be confused. But we&#x27;re not doing arithmetic here:
+we&#x27;re sending messages to objects. And when we&#x27;re sending messages, we start
+with the leftmost object and go to the right, no exceptions. &lt;code&gt;1 + 2 * 3&lt;&#x2F;code&gt; is
+equal to &lt;code&gt;(1 + 2 * 3)&lt;&#x2F;code&gt;: It&#x27;s &lt;code&gt;9&lt;&#x2F;code&gt;. But hey, that&#x27;s why we asked to do different
+things depending on the outcome of that equality test: so we could know the
+difference.&lt;&#x2F;p&gt;
+&lt;p&gt;You may have already been introduced to the idea of &lt;em&gt;polymorphism&lt;&#x2F;em&gt;, but this is
+an example of it in action: different objects can respond to the same messages
+in different ways. We can ask an object, directly or indirectly, about its
+identity, and tell it to do a different thing depending on what it is. By the
+same mechanism, we can just ask an object to do something (like figure out if
+it&#x27;s equal to another object) without worrying about &lt;em&gt;how&lt;&#x2F;em&gt; that object does
+it. We can just trust the object to smart enough to do it, and not worry about
+the nitty-gritty. Using this power, we&#x27;ve created what is an essentially an if
+statement, just based on letting behavior change depending on what object we&#x27;re
+talking to.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;the-soup-of-life&quot;&gt;The Soup of Life&lt;&#x2F;h1&gt;
+&lt;p&gt;If objects are independent actors that communicate with each other, you can
+think of an object oriented program as a sort of... &lt;em&gt;soup&lt;&#x2F;em&gt;, maybe a primordial
+ocean full of organisms. But with more message passing and less brutal
+violence. Amoeba office? Forget it. I think you get the point.&lt;&#x2F;p&gt;
+&lt;p&gt;Object Oriented Programming asks us to visualize a program as a living organism,
+made up of smaller organisms. As RNA sends requests between the cells in our
+bodies, messages send questions and answers and requests to act between objects.&lt;&#x2F;p&gt;
+&lt;p&gt;Sooner or later, all programming paradigms are about how to manage complexity,
+and this is true of OO as well: The idea is that by making lots of little
+organisms, each with their own internal state that they manage, each taking care
+of their own concerns, the entire program becomes simpler: each object looks
+after itself, and you, the programmer, don&#x27;t have to hold as much in your
+head. Much as a general in the army can send troops out without packing their
+lunchboxes or checking their guns for them, larger objects can command smaller
+ones without worrying about the details, of, say, how the thing they asked that
+database object to store got stored. And like in an army, if that database
+object is bad, and needs to be replaced, so long as it can respond to the same
+&lt;em&gt;commands&lt;&#x2F;em&gt;, the same &lt;em&gt;messages&lt;&#x2F;em&gt;, there&#x27;s no reason why the rest of the program
+can&#x27;t keep chugging onwards. If you get a heart transplant, your blood doesn&#x27;t
+get all surprised that your heart is new and different: it&#x27;s still a heart, with
+the same interface, so it&#x27;s no big deal (okay, sometimes heart transplants are
+rejected: the human body is not a great OO system...).&lt;&#x2F;p&gt;
+&lt;p&gt;This is the fundamental OO principle of &lt;em&gt;encapsulation&lt;&#x2F;em&gt; in action. The idea that
+so long as an object answers the messages it&#x27;s supposed to in the way it&#x27;s
+supposed, we can replace it, and other objects don&#x27;t need to be concerned about
+how it does its job. In a well-designed OO program, other objects can&#x27;t even
+&lt;em&gt;know&lt;&#x2F;em&gt; how it does its job: just that it does it. And through this
+encapsulation, we get &lt;em&gt;abstraction&lt;&#x2F;em&gt;: since objects don&#x27;t have to worry about
+other objects&#x27; internals, they don&#x27;t have to worry about the nitty-gritty
+details, and can think in terms of what they need done, not how those things
+happen.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;another-example&quot;&gt;Another Example&lt;&#x2F;h2&gt;
+&lt;p&gt;The classic example here is collections. So... let&#x27;s talk about getting a random
+value from a range:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;r := (1 to: 10).
+r atRandom.
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The &lt;code&gt;:=&lt;&#x2F;code&gt; syntax might seem funky to you, but that&#x27;s how we&#x27;re assigning
+variables values. I already used the &lt;code&gt;=&lt;&#x2F;code&gt; sign that you might be used to up
+above, so we&#x27;re stuck with it. We&#x27;re assigning &lt;code&gt;r&lt;&#x2F;code&gt; the result of sending &lt;code&gt;to: 10&lt;&#x2F;code&gt; to &lt;code&gt;1&lt;&#x2F;code&gt;, which is an &lt;code&gt;Interval&lt;&#x2F;code&gt;: a collection that contains all the values
+between 1 and 10. It&#x27;s a range. Not super complicated. But what if we were using
+an Array instead?&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;r := Array new: 3.
+r at: 1 put: 5.
+r at: 2 put: 10.
+r at: 3 put: 15.
+r atRandom. 
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This is a little fancier: we&#x27;re sending a message to the class &lt;code&gt;Array&lt;&#x2F;code&gt;, asking
+it to make a &lt;code&gt;new&lt;&#x2F;code&gt; array, with &lt;code&gt;3&lt;&#x2F;code&gt; elements. So for a moment, we can talk about
+classes. Classes are objects too, and you can send a message to them, just like
+anything else. They&#x27;re just objects that create other objects from a sort of
+blueprint, so creating a new object usually involves talking to one. And yes,
+Classes do have a class of their own, it&#x27;s called &lt;code&gt;Class&lt;&#x2F;code&gt;. Don&#x27;t ask me what
+class &lt;code&gt;Class&lt;&#x2F;code&gt; has, I don&#x27;t know. This is all I will say about classes.&lt;&#x2F;p&gt;
+&lt;p&gt;Once we have an array, we can ask it to put things inside itself. With
+&lt;code&gt;at:put:&lt;&#x2F;code&gt;, we&#x27;re asking it to &lt;code&gt;put:&lt;&#x2F;code&gt; certain numbers &lt;code&gt;at:&lt;&#x2F;code&gt; various locations
+inside the array. In this case, the first three locations (yes, experienced
+programmers location numbers start at one. Sorry).&lt;&#x2F;p&gt;
+&lt;p&gt;But that final line, &lt;code&gt;r atRandom.&lt;&#x2F;code&gt;, is the same, even though getting a random
+number from a range and a random element from an array are totally different
+operations. This is why I used this example, because this is the abstraction I&#x27;m
+describing: it doesn&#x27;t matter what the object is and how it works, and we, the
+programmers fishing out a random element, don&#x27;t have to think about it.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;it-s-about-relationships&quot;&gt;It&#x27;s about relationships&lt;&#x2F;h1&gt;
+&lt;p&gt;I&#x27;ve mostly focused on single objects, but as I said above, Object Oriented
+programming is, in a big way, about taking a bunch of objects and having them
+all interact to form a greater whole, and how to build a complicated system out
+of those objects in a way that makes the whole thing easy to work with and
+modify.&lt;&#x2F;p&gt;
+&lt;p&gt;This is an art onto itself, and making a good object oriented program is closely
+related to how to make a good &lt;em&gt;program&lt;&#x2F;em&gt;, something smarter people than I have
+been challenged by. Over time, people have noticed that certain common problems
+are easily solved by certain types of objects interacting in a certain way. In
+1994, four programmers published a book describing 23 of these common scenarios,
+and gave the solutions to these kinds of common scenarios a name: &lt;em&gt;design
+patterns&lt;&#x2F;em&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;People focus on &lt;em&gt;specific&lt;&#x2F;em&gt; design patterns too much. I&#x27;m not going to talk about
+any of them. But what design patterns, in the programming sense, really are are
+a set of thought tools: they provide you with useful strategies for dealing with
+common situations that come up a lot. As you program, you&#x27;ll develop your own
+strategies of these sorts. And if they work well for you and lead to good code,
+they&#x27;re just as valid as any design patterns you might see online. If it turns
+out they work badly... well, that&#x27;s learning.&lt;&#x2F;p&gt;
+&lt;p&gt;In an ideal world, we could strip out all repetition from code, and you&#x27;d never
+write the same line twice. But in the real world, it&#x27;s almost impossible to
+eliminate all patterns from your code even with the most powerful of tools
+(looking at you, Lisp programmers). Patterns in code have existed before OO, and
+the concept of design patterns applies just as strongly to every programming
+language out there, OO or no. So knowing about patterns that are helpful is
+good. By the same token, however, don&#x27;t think of them as &lt;em&gt;anything other than
+tools&lt;&#x2F;em&gt;, and the moment they hinder you rather than help you, throw them away. If
+you put the name of the pattern you used into the name of your class, you&#x27;re
+probably doing it wrong.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;closing&quot;&gt;Closing&lt;&#x2F;h1&gt;
+&lt;p&gt;If you asked me what OO is all about, I&#x27;d say it&#x27;s about writing simple,
+autonomous actors that combine together to build a more complex program that&#x27;s
+easier to understand than a giant, creaking monolith. Everything else is just
+fallout from that philosophy: ways of making that goal attainable, and ways that
+help to make complicated systems simple and manageable. I didn&#x27;t talk about
+subclasses here, because subclasses aren&#x27;t a core feature of OO: they&#x27;re just
+another tool for the programmer. A valuable, useful tool, but not the &lt;em&gt;soul&lt;&#x2F;em&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;The programming language I used in the examples above isn&#x27;t some fake
+programming language I invented: It&#x27;s a language called Smalltalk, born at Xerox
+in the late 1970s and released in more or less its present form in 1980. While
+it wasn&#x27;t the first OO language, it was the language from which the coin was
+termed, and it was Smalltalk and ideas that emerged from the Smalltalk community
+that were foundational to the way we understand OO today. It was originally
+designed to be so simple that it could be taught to children. It was designed to
+have few core concepts, and it was designed around a graphical, visual
+environment, navigated with a mouse. Smalltalk&#x27;s interface would eventually form
+the basis for the original Macintosh.&lt;&#x2F;p&gt;
+&lt;p&gt;It&#x27;s hard to explain how revolutionary Smalltalk is to someone who&#x27;s never used
+it. It&#x27;s a strange, bizarre programming langauge that shaped the present and yet
+feels like it came from an alternate future that never came to pass. And I
+encourage you to play around with it a bit. Download a copy of of
+&lt;a href=&quot;https:&#x2F;&#x2F;squeak.org&#x2F;&quot;&gt;Squeak&lt;&#x2F;a&gt; and just... experiment. It&#x27;s fun, and it might
+give you a new outlook on the programming langauges you use today.&lt;&#x2F;p&gt;
+&lt;p&gt;Likewise, I hope this article has given you a new outlook on OO.&lt;&#x2F;p&gt;
+&lt;hr class=&quot;fancy&quot; &#x2F;&gt;
+&lt;p&gt;Writing this blog is just a thing I do in my spare time, but if you have a spare
+$5 and you enjoyed it, you can donate to me on Ko-fi by clicking the dollar sign
+in bottom right. Don&#x27;t feel obligated to do this. But it&#x27;s an option.&lt;&#x2F;p&gt;
+</content>
+	</entry>
+	<entry xml:lang="en">
+		<title>Undefined Behavior, to make a short story long</title>
+		<published>2020-09-10T00:00:00+00:00</published>
+		<updated>2020-09-10T00:00:00+00:00</updated>
+		<link href="https://jjbarr.github.io/blog/ub/" type="text/html"/>
+		<id>https://jjbarr.github.io/blog/ub/</id>
+		<content type="html">&lt;p&gt;I know a number of people who are taking an introductory course in C (not C++,
+thank the lord, but normal C) right now, and some of them just failed an exam
+question because it invoked undefined behavior. So... here&#x27;s my explanation of
+UB, for recovering Java programmers and other people who may not have
+encountered such a concept. Why? Because nobody tells new C programmers about
+UB, and &lt;em&gt;understanding&lt;&#x2F;em&gt; UB is crucial to understanding C, reasoning about what
+the compiler will do to your code, and most crucially and hardest of all,
+writing C code that is &lt;em&gt;safe&lt;&#x2F;em&gt;. I&#x27;ve also included an explanation of a few
+undefined-adjacent behaviors (implementation-defined and unspecified behaviors,
+to be exact) because they&#x27;re important for similar reasons.&lt;&#x2F;p&gt;
+&lt;p&gt;Welcome to C, where you&#x27;re lucky if your program crashes, your compiler is
+conspiring against you in the name of benchmark numbers, and being a language
+lawyer is a valid survival tactic.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;what-is-ub&quot;&gt;What is UB?&lt;&#x2F;h1&gt;
+&lt;p&gt;UB, or Undefined Behavior, is a well-intentioned mistake that X3J11 (the C
+standards working group) made in 1989 and we&#x27;ve been living with ever since. But
+that&#x27;s not really a helpful definition. So... here&#x27;s the real deal.&lt;&#x2F;p&gt;
+&lt;p&gt;C (and to a lesser extent C++) were explicitly designed to run on many different
+machines, and to do so with pretty good performance. And nowadays, this is no
+big deal, really: be honest, how many architectures do we really have in use?
+there&#x27;s x86, there&#x27;s ARM, and those are the big players. Out around the edges
+there are bunch of other platforms, stuff like the AVRs, the RiscVs, and so on,
+but most new CPU architectures are iterations on older ones, and have more or
+less similar capabilities, behaviors, and instruction sets. We still have issues
+with this sort of thing, but differences between architectures are relatively
+minor for the most part.&lt;&#x2F;p&gt;
+&lt;p&gt;That was &lt;em&gt;not&lt;&#x2F;em&gt; true in 1989, and sure as heck not true before that. There were
+&lt;em&gt;weird&lt;&#x2F;em&gt; CPUs floating around, 8&#x2F;16 bit CPUs with extreme limitations were still
+pretty popular in a lot places, and C had to run just as well there as it did on
+VAXen that had dedicated CPU instructions for evaluating polynomials from tables
+(yes, really).&lt;&#x2F;p&gt;
+&lt;p&gt;So, to benefit implementors, C defined three categories of behavior that the
+spec gave compilers leeway on: Implementation-defined Behavior, Unspecified
+Behavior, and Undefined Behavior.&lt;&#x2F;p&gt;
+&lt;p&gt;Implementation-defined Behavior is the simplest, and the one you probably don&#x27;t
+even think about. This is stuff that could change from implementation to
+implementation (within certain limits given by the spec) but the implementation
+has to document the behavior and obey its own documentation. This is stuff like
+how many bits are in a byte (no really, it can be more than eight: if you study
+old CPUs this actually makes sense), how big &lt;code&gt;int&lt;&#x2F;code&gt; and other standard data types
+are, endianness, and how floats are represented (at this point a few of you
+might be saying &amp;quot;hang on, why isn&#x27;t C guaranteeing IEEE floats like every other
+programming language?&amp;quot; The answer is that C predates IEEE floats and while ANSI
+C doesn&#x27;t, it still needed to run on platforms were IEEE floats weren&#x27;t
+guaranteed). If you&#x27;ve worked at a hardware level before none of this stuff is
+surprising. The compiler gets license here, but more or less it&#x27;s just to choose
+the most reasonable and performant choice for the given architecture.&lt;&#x2F;p&gt;
+&lt;p&gt;Unspecified Behavior is a little trickier. This is stuff that might change based
+on your compiler settings or your implementation, or even on where it happens in
+your code. The compiler has a set of options that it can choose from for what to
+do, defined by the standard, and it can do any one of those things, any time the
+behavior is invoked, without documenting it, based on what it feels like doing
+at the moment. Once again, a lot about how your type is specifically represented
+on the hardware falls into unspecified behavior: Struct padding is a classic
+example of this: While the &lt;em&gt;order&lt;&#x2F;em&gt; of the data in a struct is defined, the
+compiler can put as much padding between two fields as it feels like putting
+there (although in practice it will always just pad to the type alignment). The
+main place unspecified behavior can trip people up is the evaluation of
+sub-expressions: &lt;code&gt;a(x) + b(x)&lt;&#x2F;code&gt; isn&#x27;t guaranteed to be evaluated from left to
+right: the compiler could actually call &lt;code&gt;b&lt;&#x2F;code&gt; first, which might cause issues for
+you if &lt;code&gt;x&lt;&#x2F;code&gt; is a pointer. Likewise, &lt;code&gt;f(a(x),b(x))&lt;&#x2F;code&gt; guarantees that &lt;code&gt;f&lt;&#x2F;code&gt; is called
+after &lt;code&gt;a&lt;&#x2F;code&gt; and &lt;code&gt;b&lt;&#x2F;code&gt;, but doesn&#x27;t guarantee the order &lt;code&gt;a&lt;&#x2F;code&gt; and &lt;code&gt;b&lt;&#x2F;code&gt; are called in. Of
+course, &lt;code&gt;a(x) || b(x)&lt;&#x2F;code&gt; and the other logical operators do have a defined
+order, because &lt;code&gt;a(x) || b(x)&lt;&#x2F;code&gt; short-circuits, but it&#x27;s the exception, not the
+rule.&lt;&#x2F;p&gt;
+&lt;p&gt;Which brings us to &lt;em&gt;Undefined Behavior&lt;&#x2F;em&gt;. Undefined Behavior is the most
+surprising of C&#x27;s 3 categories, because the spec imposes no requirements on what
+happens in the case of undefined behavior: Your code might terminate, the
+compiler might issue a warning, or even refuse to compile the code, the behavior
+might be ignored, demons might fly out of your nose, your hard drive could be
+wiped (those last two probably won&#x27;t happen, don&#x27;t worry...), and whether or not
+any of this behavior is documented is entirely left in the hands of the
+implementer with absolutely no requirements. Crucially, this doesn&#x27;t guarantee a
+compiler error: it doesn&#x27;t guarantee &lt;em&gt;anything&lt;&#x2F;em&gt;. So the instant your code
+invokes undefined behavior, all bets are off. You are left in the hands of the
+compiler, and the compiler is not so much a monkey&#x27;s paw as it is an entire
+monkey.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;so-which-things-invoke-undefined-behavior-and-why-does-it-matter&quot;&gt;So... which things invoke undefined behavior, and why does it matter?&lt;&#x2F;h1&gt;
+&lt;p&gt;Way too many things, I can&#x27;t list them all. Most of them aren&#x27;t things that will
+ever happen, so I won&#x27;t bother (stuff like your program not defining a &lt;code&gt;main&lt;&#x2F;code&gt;
+function), but here are the highlights.&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;Use of uninitialized variables.&lt;&#x2F;li&gt;
+&lt;li&gt;Signed Integer Overflow&lt;&#x2F;li&gt;
+&lt;li&gt;Dereferencing pointers to things you don&#x27;t own (&lt;code&gt;free&lt;&#x2F;code&gt;d pointers, pointers to
+random places in RAM, etc) and accessing array elements that are out of
+bounds.&lt;&#x2F;li&gt;
+&lt;li&gt;Dereferencing NULL&lt;&#x2F;li&gt;
+&lt;li&gt;Violating Aliasing Rules (which is a while complicated thing unto itself...)&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;These are the ones you actually have to worry about 99% of the time. I mean,
+it&#x27;s also undefined to shift a 32-bit number by 32+ bits, but in practice it&#x27;s
+either gonna be the number itself, or it will be zero. Also, why would you do
+that?&lt;&#x2F;p&gt;
+&lt;p&gt;This matters, because undefined behavior can result in weird, unexpected
+results. A big part of why is because of how compilers &lt;em&gt;implement&lt;&#x2F;em&gt; Undefined
+Behavior: namely, they&#x27;ve all more or less decided that since they can do
+anything, that includes &lt;em&gt;assuming that UB won&#x27;t happen&lt;&#x2F;em&gt;, and propagating those
+assumptions backwards through your code to make it &amp;quot;faster&amp;quot; (and by faster, I
+mean &lt;em&gt;wrong&lt;&#x2F;em&gt;). This, as well as the other common approach of ignoring UB, can
+lead to bewildering program bugs.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;do-you-have-any-examples&quot;&gt;Do you have any examples?&lt;&#x2F;h1&gt;
+&lt;p&gt;You bet! Let&#x27;s take them one by one, shall we?&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;uninitialized-variables&quot;&gt;Uninitialized variables&lt;&#x2F;h2&gt;
+&lt;p&gt;This is one of the obvious ones. I mean, if you read any integer that you
+haven&#x27;t assigned to, it could be anything, right? Well... no. Uninitialized
+variables can be much, much weirder than that. I&#x27;m not actually going to write
+an example, because I found one so perfect that I just want to share it with
+you: I give you &lt;a href=&quot;https:&#x2F;&#x2F;markshroyer.com&#x2F;2012&#x2F;06&#x2F;c-both-true-and-false&#x2F;&quot;&gt;a variable that is both true and false at the same
+time&lt;&#x2F;a&gt;. Thanks, Mark.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;signed-integer-overflow&quot;&gt;Signed Integer Overflow&lt;&#x2F;h2&gt;
+&lt;p&gt;&amp;quot;Wait!&amp;quot; I hear you saying. &amp;quot;Doesn&#x27;t integer overflow just wrap around?&amp;quot;
+Nope. Not according to C anyways. &lt;em&gt;unsigned&lt;&#x2F;em&gt; integers are guaranteed to wrap
+around, but when it comes to unsigned integers, they never wrap.&lt;&#x2F;p&gt;
+&lt;p&gt;Here are a few practical consequences of this. Take a look at this simple code.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; i &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; i &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;lt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; i&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;++&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;) {
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;never_knows_best&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;()&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;printf&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;I&amp;#39;m overflowing!&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ebcb8b;&quot;&gt;\n&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;)
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The compiler can look at this and say: &amp;quot;hey, &lt;code&gt;i&lt;&#x2F;code&gt; is zero, and we just add to it
+forever. It&#x27;s never gonna be less than zero! I can optimize all this away!&amp;quot; So
+it does. In practice, a lot of common compilers will optimize this code to be
+this:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;while &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;) {
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;never_knows_best&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;()&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The reason why compiler do this is so they can unroll your loops and because
+they can assume that they know how many iterations your normal for loop goes
+for. But it can be irritating. It also means that this code:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;return true if x+y overflows&#x2F;underflows
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;test_for_overflow&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;x&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;y) {
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(y &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;lt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;? &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;((x&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;y) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; x) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;((x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; y) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; x)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Actually will always return false, because compilers apply algebra and say that
+both conditions can never happen. Or maybe it won&#x27;t: it depends on your compiler
+settings and what compiler you use. Isn&#x27;t UB fun?&lt;&#x2F;p&gt;
+&lt;p&gt;(By the way, if you need to check for an overflow, here&#x27;s a way to do it:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;test_for_overflow&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;x&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;y) {
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(y &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;lt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;? &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;lt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(INT_MIN &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; y)) 
+                  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(INT_MAX &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; y))&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;I mean, that&#x27;s probably right. I haven&#x27;t tested it so don&#x27;t trust me. GCC also 
+has built-ins for this if you don&#x27;t care about compatibility).&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;a-brief-side-note-forward-progress&quot;&gt;A brief side note: Forward Progress&lt;&#x2F;h2&gt;
+&lt;p&gt;This is not so much undefined behavior as explicitly defined behavior, but it
+can come and bite you similarly and the next example reminded me of it, so here
+you go: recent C standards have made it explicit that in certain cases C++&#x27;s
+concept of &amp;quot;Forward progress&amp;quot; applies (previously this was just a way to
+interpret the spec). Specifically, if you have a loop that depends on some
+variable for its test, but doesn&#x27;t either&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;Do some kind of I&#x2F;O&lt;&#x2F;li&gt;
+&lt;li&gt;Touch a volatile variable&lt;&#x2F;li&gt;
+&lt;li&gt;Perform atomic or synchronization operations (threading stuff)&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;The compiler is free to assume that the loop &lt;em&gt;will eventually&lt;&#x2F;em&gt; terminate and act
+as if it will. Therefore, these two seemingly identical code fragments behave
+&lt;em&gt;very&lt;&#x2F;em&gt; differently.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; foo &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;while &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(foo) {} &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;this immediately exits after one iteration
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;while&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;) {} &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; this will loop forever
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Basically, if you depend on a variable, the compiler assumes you terminate. And
+if terminating in one iteration would yield the same result as terminating in
+1000 iterations, then as far as the compiler is concerned you terminate in one
+iteration.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;dereferencing-random-pointers-and-out-of-bounds-access&quot;&gt;Dereferencing random pointers and out-of-bounds access&lt;&#x2F;h2&gt;
+&lt;p&gt;This is really just here because if you do this on &lt;em&gt;real hardware&lt;&#x2F;em&gt;, anything
+could happen, from nothing to getting garbage to crashing your code. In
+practice, it&#x27;s relatively uncommon for the compiler to do a ton with this, but
+it does happen. As with null pointers (we&#x27;ll get it), the compiler can use this
+to optimize away things that &amp;quot;can&#x27;t&amp;quot; happen. In particular, it can come to some
+pretty wacky logical derivations based on this.&lt;&#x2F;p&gt;
+&lt;p&gt;Once again, I won&#x27;t provide an example here. Instead I&#x27;ll defer to everyone&#x27;s
+favorite Microsoft employee, Raymond Chen (seriously, The New Old Thing is an
+excellent blog) to explain how &lt;a href=&quot;https:&#x2F;&#x2F;devblogs.microsoft.com&#x2F;oldnewthing&#x2F;20140627-00&#x2F;?p=633&quot;&gt;Undefined Behavior can result in time
+travel&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;null-pointer-access&quot;&gt;NULL pointer access&lt;&#x2F;h2&gt;
+&lt;p&gt;Here&#x27;s &lt;em&gt;the&lt;&#x2F;em&gt; classic UB example that everyone uses. Let&#x27;s say you&#x27;ve got this
+function here:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;do_stuff&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int *&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;p) {
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;if&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(p &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;== NULL&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; someresult &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;do some stuff
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; someresult&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Now, let&#x27;s say there was a bug, so you unthinkingly insert this debugging
+statement:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;do_stuff&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int *&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;p) {
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;printf&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;the value of p is &lt;&#x2F;span&gt;&lt;span style=&quot;color:#ebcb8b;&quot;&gt;%d&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;p)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;if&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(p &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;== NULL&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; someresult &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;do some stuff
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; someresult&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;At this point, the compiler says &amp;quot;hang on, you derferenced &lt;code&gt;p&lt;&#x2F;code&gt;. If you
+derference it, it can&#x27;t be NULL, because if it was NULL that would be undefined
+behavior.&amp;quot;&lt;&#x2F;p&gt;
+&lt;p&gt;As a result, this &amp;quot;optimization&amp;quot; happens:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;do_stuff&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int *&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;p) {
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;printf&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;the value of p is &lt;&#x2F;span&gt;&lt;span style=&quot;color:#ebcb8b;&quot;&gt;%d&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;p)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; someresult &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;do some stuff
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; someresult&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Woo, NULL checks gone. Live fast and die hard. This isn&#x27;t so bad, but this code
+(based on something from an &lt;a href=&quot;https:&#x2F;&#x2F;blog.llvm.org&#x2F;posts&#x2F;2011-05-14-what-every-c-programmer-should-know_14&#x2F;&quot;&gt;LLVM blog
+post&lt;&#x2F;a&gt;)
+also can optimize the same way:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;do_stuff&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int *&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;p) {
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; unused &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= *&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;p&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;if&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;(p &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;== NULL&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;int&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; someresult &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;do some stuff
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; someresult&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;...except of course that &lt;code&gt;unused&lt;&#x2F;code&gt; itself is optimized away because it&#x27;s never
+used. &lt;em&gt;But&lt;&#x2F;em&gt; if &lt;code&gt;unused&lt;&#x2F;code&gt; is optimized away first, the check stays in because now
+there&#x27;s no reason to take it out. This can change between compiler versions, and
+is based on a real Linux kernel bug.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;aliasing-rules&quot;&gt;Aliasing rules&lt;&#x2F;h2&gt;
+&lt;p&gt;Aliasing rules are another rich vein of undefined behavior: TL;DR, if you make a
+cast between two different pointer types, like between &lt;code&gt;int*&lt;&#x2F;code&gt; and &lt;code&gt;float*&lt;&#x2F;code&gt;, and
+then deference that, it&#x27;s undefined. You have to use &lt;code&gt;memcpy&lt;&#x2F;code&gt; or a &lt;code&gt;union&lt;&#x2F;code&gt;, and
+pray that the compiler will optimize the extra copies out. Obviously, this is
+kind of lame (the compiler won&#x27;t do what you want it to always). But you might
+wonder how often this comes up in real-world C code.&lt;&#x2F;p&gt;
+&lt;p&gt;Great question. The answer is, more than you&#x27;d think. In fact, in C89, this was
+&lt;em&gt;defined&lt;&#x2F;em&gt; behavior. It was changed in C99 to open up opportunities for compiler
+optimization. Ironically, 1999 was the year of the most famous use of this exact
+undefined behavior: Quake 3&#x27;s &lt;code&gt;Q_rsqrt&lt;&#x2F;code&gt;, aka &lt;code&gt;FastInvSqrt&lt;&#x2F;code&gt;, which computes
+1&#x2F;sqrt(x) like this:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;&quot;&gt;
+&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;float &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;Q_rsqrt&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;( &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;float &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;number )
+{
+	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;long&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; i&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;float&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; x2&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; y&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;const float&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; threehalfs &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;5&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;F&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;	x2 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; number &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;* &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;5&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;F&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;	y  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; number&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;	i  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;( &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;long * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;amp;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;y&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;                       &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; evil floating point bit level hacking
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;	i  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0x5f3759df &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;- &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;( i &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;gt;&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;1 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;               &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; what the fuck? 
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;	y  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;( &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;float * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;amp;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;i&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;	y  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; y &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;* &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;( threehalfs &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;- &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;( x2 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; y &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; y ) )&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;   &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; 1st iteration
+&#x2F;&#x2F;	y  = y * ( threehalfs - ( x2 * y * y ) );   &#x2F;&#x2F; 2nd iteration, this can be removed
+
+	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt; y&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d8dee9;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This is totally valid C89, but god only knows what a C99 compiler would do to
+it. (By the way, use built-in inverse sqrt() functions instead of this on modern
+computers: they can use hardware instructions that are way faster than this
+weird hack. Second note, Carmack didn&#x27;t write this, it comes from SGI and was
+originally written in the 80s. But I digress...). And a lot of low-level code
+relies on these kinds of hacks: not for anything so fancy as this, but just for
+things like reading binary data off disk and directly into a struct (although
+maybe don&#x27;t do that either...). The point is, it&#x27;s sometimes hard to avoid and
+it&#x27;s an easy trap to fall into.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;how-do-i-avoid-undefined-behavior&quot;&gt;How do I avoid Undefined Behavior?&lt;&#x2F;h1&gt;
+&lt;p&gt;It can be hard or impossible to avoid UB. There are a lot of traps and pitfalls,
+and a lot of examples are difficult to avoid. So... yeah, you can&#x27;t. But that
+doesn&#x27;t mean you shouldn&#x27;t &lt;em&gt;try&lt;&#x2F;em&gt;. Thankfully, on modern versions of GCC and
+Clang, we do have tools that can help: if you compile your code with
+&lt;code&gt;-fsanitize=undefined&lt;&#x2F;code&gt;, you&#x27;ll enable the UBSanitzer, which will do compile-time
+and runtime checks to make sure your code isn&#x27;t invoking UB. There are a huge
+number of checks available, and while it probably can&#x27;t catch everything, it&#x27;s a
+useful thing to run on your code.&lt;&#x2F;p&gt;
+&lt;p&gt;However, there are other cases where it&#x27;s impractical or impossible to avoid UB
+(see the aliasing stuff above), or you&#x27;re trying to avoid it but you&#x27;re writing
+security-critical code and want insurance in case you fail. In &lt;em&gt;those&lt;&#x2F;em&gt; cases,
+there are compiler flags you can feed your compiler to tell it that you want it
+to stop making assumptions based on certain types of undefined behavior. In
+particular, &lt;code&gt;-fwrapv&lt;&#x2F;code&gt; will disable optimizations based on the assumption that
+int arithmetic never overflows, and &lt;code&gt;-fno-strict-aliasing&lt;&#x2F;code&gt; disables aliasing
+rule checks. The second in particular is extremely common in production
+codebases, and it&#x27;s worthwhile to know about.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;resources&quot;&gt;Resources&lt;&#x2F;h1&gt;
+&lt;p&gt;If you have infinite free time, you can read all 500 pages of the C spec for
+whatever specific version of C you&#x27;re writing. I don&#x27;t really recommend this...&lt;&#x2F;p&gt;
+&lt;p&gt;Also, I linked a few different blog posts, but I only linked one part of LLVM&#x27;s
+series &lt;a href=&quot;https:&#x2F;&#x2F;blog.llvm.org&#x2F;posts&#x2F;2011-05-13-what-every-c-programmer-should-know&#x2F;&quot;&gt;What Every C Programmer Should Know About Undefined
+Behavior&lt;&#x2F;a&gt;. I
+highly recommend reading more of it. It&#x27;s very good and I stole a lot from it
+writing this.&lt;&#x2F;p&gt;
+&lt;p&gt;For more general resources, and other stuff you might like if you like
+this... If you want more information about the pitfalls of writing C or more
+about low-level work, I highly recommend &lt;a href=&quot;https:&#x2F;&#x2F;randomascii.wordpress.com&#x2F;&quot;&gt;Bruce Dawson&#x27;s
+blog&lt;&#x2F;a&gt; and his series about floating point in
+particular. And if you&#x27;re interested in games programming and found my tangent
+about Quake 3 cool, or you&#x27;re interested in generally learning more about C
+programming, check out &lt;a href=&quot;https:&#x2F;&#x2F;fabiensanglard.net&#x2F;&quot;&gt;Fabien Sanglard&#x27;s website&lt;&#x2F;a&gt;,
+where you can find code reviews and discussions of not just Quake 3 and id
+software&#x27;s work, but similar writings on lot of other 90s video games with
+available source code as well.&lt;&#x2F;p&gt;
+&lt;hr class=&quot;fancy&quot; &#x2F;&gt;
+&lt;p&gt;If you enjoyed this blog post and you don&#x27;t have anything better to spend your
+money on, you can donate to me on Ko-Fi by clicking the dollar sign on the
+bottom right. If you want to read whatever I post the next time I write
+something, you can click the RSS icon to subscribe to my RSS. And if you have a
+comment for me, you can email me by clicking the mail icon. This article is best
+viewed with a web browser, but if you&#x27;re reading these words you probably
+already know that. Hopefully, this was helpful, but I&#x27;m too insecure to
+guarantee that it will be.&lt;&#x2F;p&gt;
+</content>
+	</entry>
+	<entry xml:lang="en">
+		<title>I sell out</title>
+		<published>2020-08-14T00:00:00+00:00</published>
+		<updated>2020-08-14T00:00:00+00:00</updated>
+		<link href="https://jjbarr.github.io/blog/sellout/" type="text/html"/>
+		<id>https://jjbarr.github.io/blog/sellout/</id>
+		<content type="html">&lt;p&gt;Yeah, so I have a ko-fi now. If you wanna donate, you can click the obvious link
+in the lower right corner of the page. If not, that... honestly makes a ton of
+sense.&lt;&#x2F;p&gt;
+&lt;p&gt;Please don&#x27;t give me money you can&#x27;t afford to. I don&#x27;t make a living doing
+this, it&#x27;s just what I do in my spare time. Having said that, any donations you
+do give are much appreciated. &lt;&#x2F;p&gt;
+&lt;p&gt;In better news, my favicon sucks less now, I have a public email address for you
+to send your flames to, and the site&#x27;s CSS has just generally been
+improved. I&#x27;ve tried to keep the page weight minimal, but I&#x27;ve had to actually
+pull in a font, for consistency and reasons that will be explained in my next
+post. Sorry about that to anyone on dial-up who tries to read my site.&lt;&#x2F;p&gt;
+</content>
+	</entry>
+	<entry xml:lang="en">
+		<title>Vulkan From Zero: Part 1</title>
+		<published>2020-08-12T00:00:00+00:00</published>
+		<updated>2020-08-12T00:00:00+00:00</updated>
+		<link href="https://jjbarr.github.io/blog/vk0-1/" type="text/html"/>
+		<id>https://jjbarr.github.io/blog/vk0-1/</id>
+		<content type="html">&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;www.khronos.org&#x2F;vulkan&#x2F;&quot;&gt;Vulkan&lt;&#x2F;a&gt; seems to be really exciting all the
+computer graphics people, and it&#x27;s easy to see why. Actually I lied: unless
+you&#x27;re in some way involved in the graphics scene, it&#x27;s not easy at all. In
+short, it&#x27;s a new API that provides a lower level interface to the GPU, with
+less implicit global state, and with a lot of the cruft and garbage and bad
+ideas that have accumulated in OpenGL over the years forcibly ripped out. Which
+is great, and if you&#x27;re a certain kind of programmer you&#x27;re probably already
+drooling. Being the sort of person who likes clean, explicit verbosity over
+magical incantations because I always have the sinking feeling that everything
+is about to fuck up and I&#x27;ll be suddenly tested on every element I don&#x27;t
+understand, I though jumping into graphics programming with Vulkan seemed like a
+good idea.&lt;&#x2F;p&gt;
+&lt;p&gt;Emphatically, it probably wasn&#x27;t. I haven&#x27;t even &lt;em&gt;reached&lt;&#x2F;em&gt; the point of really
+understanding anything, and I already know that. Vulkan is really big, very
+complicated, and most irritatingly, pretty much all of the existing resources
+assume that you already know what you&#x27;re doing. Which, as established, I
+don&#x27;t. They also assume that you want to work in C++ for the most part, which I
+&lt;em&gt;also&lt;&#x2F;em&gt; don&#x27;t, because that&#x27;s just a whole other garbage fire. But if I spend all
+my time trashing C++, I&#x27;ll have none less for Vulkan, and &lt;a href=&quot;http:&#x2F;&#x2F;yosefk.com&#x2F;c++fqa&#x2F;index.html&quot;&gt;Yossi
+Kreinin&lt;&#x2F;a&gt; has more than covered that
+particular base (Yes, the FQA is outdated, but it&#x27;s really entertaining...).&lt;&#x2F;p&gt;
+&lt;p&gt;I have a peculiar personality flaw: I hate jumping into things. So instead of
+writing&#x2F;copy-pasting code until I had a triangle on-screen, I &lt;em&gt;really&lt;&#x2F;em&gt; wanted to
+understand Vulkan in principle first, and have a broad overview of how all the
+parts fit together. This is hard because (as mentioned) all the docs assume you
+know what you&#x27;re talking about (or, in the case of the official spec, are
+&lt;em&gt;painfully&lt;&#x2F;em&gt; verbose), and Vulkan is really, really big. Massive.&lt;&#x2F;p&gt;
+&lt;p&gt;However, while I still haven&#x27;t put that triangle on-screen yet (that&#x27;s for the
+next blog post), I&#x27;ve built up enough of a mental map of Vulkan to sort of
+understand how the whole thing works. Kind of. Maybe. We shall see. Thus, armed
+with a copy of &lt;a href=&quot;https:&#x2F;&#x2F;www.khronos.org&#x2F;registry&#x2F;vulkan&#x2F;specs&#x2F;1.2-extensions&#x2F;html&#x2F;index.html&quot;&gt;The Vulkan Spec
+&lt;&#x2F;a&gt;,
+&lt;a href=&quot;https:&#x2F;&#x2F;www.khronos.org&#x2F;registry&#x2F;vulkan&#x2F;specs&#x2F;1.1&#x2F;refguide&#x2F;Vulkan-1.1-web.pdf&quot;&gt;The Vulkan 1.1 API Quick Reference
+&lt;&#x2F;a&gt;,
+&lt;a href=&quot;https:&#x2F;&#x2F;vulkan-tutorial.com&#x2F;&quot;&gt;The Vulkan Tutorial&lt;&#x2F;a&gt;, and &lt;a href=&quot;https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Vulcan_salute&quot;&gt;The Vulkan
+Salute&lt;&#x2F;a&gt;, I shall attempt to provide
+a broad overview of Vulkan, more for my own sanity than for any utility to
+anybody else.&lt;&#x2F;p&gt;
+&lt;p&gt;Live Long and Prosper.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;building-blocks&quot;&gt;Building Blocks&lt;&#x2F;h1&gt;
+&lt;p&gt;These are the small, simple parts of Vulkan. Relatively speaking, of
+course. Memory management, devices, synchronization, and resources. I&#x27;ll touch
+on work submission, but that really comes later.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;the-instance&quot;&gt;The Instance&lt;&#x2F;h2&gt;
+&lt;p&gt;The first piece of Vulkan that any user will interact with is the &lt;em&gt;instance&lt;&#x2F;em&gt;,
+the concrete object representing... well, an instance. A handle to the API.&lt;&#x2F;p&gt;
+&lt;p&gt;As for why Instance objects exist, I could read the rationale but I&#x27;m not going
+to. I&#x27;m going to guess and say that it&#x27;s probably partly so that individual API
+consumers have some kind of identifier inside the driver, and also (and this is
+more concrete) because the Vulkan spec has the concept of a &lt;em&gt;loader&lt;&#x2F;em&gt;, which is
+the actual libvulkan library you link to, which both binds you to a concrete
+implementation (a GPU driver) and can insert &lt;em&gt;layers&lt;&#x2F;em&gt; between you and that
+implementation at your or the user&#x27;s request, like the Vulkan Validation Layers
+or something like
+&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;flightlessmango&#x2F;MangoHud&quot;&gt;MangoHud&lt;&#x2F;a&gt;. Instance Creation is
+where you get to request layers, as well as standardized API extensions you may
+want or need, like the actual ability to render something to a screen. We&#x27;ll get
+to that...&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;devices-physical-and-virtual&quot;&gt;Devices, Physical and Virtual&lt;&#x2F;h2&gt;
+&lt;p&gt;The next step in bringing up a Vulkan app is to get your hands on a physical
+device handle. This could be a GPU, or something else. But realistically it&#x27;s
+going to be a GPU, or a software emulation thereof. You don&#x27;t typically interact
+with a physical device, but instead with a virtual device, from which you can
+request various features and extensions (like geometry and tessellation shaders,
+anisotropic filtering, and ray-tracing extensions...). A virtual device needn&#x27;t
+necessarily map to a single a physical device, if for example you&#x27;re using
+SLI&#x2F;Crossfire or a similar configuration. But in most cases it probably will:
+Almost nobody uses SLI&#x2F;Crossfire anymore, manufacturers don&#x27;t care, and the
+system was never quite as useful as manufacturers sold it as being. So if you
+really need this feature, it&#x27;s more likely you&#x27;re doing GPGPU work that&#x27;s above
+my pay-grade.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;queues&quot;&gt;Queues&lt;&#x2F;h2&gt;
+&lt;p&gt;Vulkan is a strictly asynchronous API: Work on the CPU continues after a job is
+submitted to GPU. Furthermore, you&#x27;re responsible for a lot of the
+synchronization, both between on-GPU jobs (some out-of-order execution is
+permitted by spec, although not as much as there might be, thank god) and
+between the CPU and the GPU.&lt;&#x2F;p&gt;
+&lt;p&gt;As such, Vulkan exposes &lt;em&gt;queues&lt;&#x2F;em&gt; to you, which are exactly what they sound like:
+work submission queues for the GPU. Different queues may only accept certain
+kinds of work: some queues may only accept compute loads, others only graphics,
+etc.&lt;&#x2F;p&gt;
+&lt;p&gt;For synchronization between queues, between operations, and between the CPU and
+GPU, Vulkan provides both binary and monotonically increasing semaphores
+(Between different GPU operations), fence barriers (between CPU and GPU), events
+(fine-grained intra-queue and host-queue synchronization), pipeline barriers,
+and the ability to wait for the queue or device to become idle (don&#x27;t do this
+unless you&#x27;re tearing down your instance and associated context: You&#x27;re letting
+the pipeline idle and wasting throughput otherwise). If you&#x27;re familiar with
+multi-threaded synchronization at all, or with out-of-order execution, these
+concepts should be pretty familiar to you. You can read the spec for additional
+information, and information about exactly what the synchronization guarantees
+are and when you need to add your own synchronization.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;memory-allocation&quot;&gt;Memory Allocation&lt;&#x2F;h2&gt;
+&lt;p&gt;Vulkan is a low-level API, and low-level, as usual, means you have to manage
+your own memory. You are responsible for allocating and freeing all your
+resources. And this includes GPU-side resources as well: If you want to load
+some data onto the GPU, it&#x27;s your job to allocate the memory for that
+data. However, allocating on-GPU under Vulkan is not like memory management that
+you may be familiar with coming from C. Under the Vulkan model, hardware doesn&#x27;t
+necessarily have a unified heap: GPUs can expose any number of heaps. Some of
+these heaps might be local to the CPU, some might be local to the GPU. Some
+might be accessible the CPU, some might be GPU-internal (you won&#x27;t be able to
+copy data to them directly). Heaps can have restrictions as to what they can be
+used for, and depending on what you want to do with the memory you&#x27;re
+allocating, you might need to choose another heap. If you need to store data
+somewhere that&#x27;s not CPU-accessible, you have to copy the data from the CPU to
+somewhere that is, and then issue a command to copy the data where you want it
+to go.&lt;&#x2F;p&gt;
+&lt;p&gt;Also notable is that Vulkan &lt;em&gt;severely&lt;&#x2F;em&gt; limits the number of allocations you can
+have (or at least, it only requires implementations to provide a very small
+number). You shouldn&#x27;t be calling &lt;code&gt;vkAllocateMemory&lt;&#x2F;code&gt; once for every single
+object you need allocated on the GPU: You&#x27;ll run out of allocations pretty
+fast. Instead, you want to make a few large allocations, containing all the
+memory you&#x27;ll need, and parcel it out in chunks as needed.&lt;&#x2F;p&gt;
+&lt;p&gt;This is pretty complicated, and most of time you don&#x27;t need this much control
+over your allocations. If you want to work with Vulkan but this whole memory
+thing is giving you a headache, AMD wrote an stb-style single-header library
+called &lt;a href=&quot;https:&#x2F;&#x2F;gpuopen.com&#x2F;vulkan-memory-allocator&#x2F;&quot;&gt;VMA&lt;&#x2F;a&gt;, which abstracts away
+most of it for you. It&#x27;s generously licensed, and while it is a C++ library, the
+interface is in C so you don&#x27;t need to sully your code in order to use it.&lt;&#x2F;p&gt;
+&lt;p&gt;However, even if you are using VMA, it&#x27;s worth being aware of all of this.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;resources&quot;&gt;Resources&lt;&#x2F;h2&gt;
+&lt;p&gt;Vulkan&#x27;s &amp;quot;resources&amp;quot; are memory blocks that contain data. There are really only
+two kinds: &lt;em&gt;buffers&lt;&#x2F;em&gt; and &lt;em&gt;images&lt;&#x2F;em&gt;. buffers and images are both blocks of data,
+but they have different uses, although they do overlap. &lt;&#x2F;p&gt;
+&lt;p&gt;Buffers are always linear arrays, and don&#x27;t have tiling, miplevels, or
+layouts. As a result, while you can read and write texture data to buffers, even
+in shaders, you probably don&#x27;t want to. They&#x27;re essentially just a bunch of
+bytes. You can use a &lt;em&gt;buffer view&lt;&#x2F;em&gt; to change how you interpret the format of the
+buffer: if it helps, think of a buffer view of a slice (a subsection of a buffer
+with a start point and extent) that also determines the type the bytes are
+interpreted as. The most common uses of buffers are as a staging area to copy
+data to other parts of GPU memory, and as shader inputs in the form of vertex
+buffers, index buffers, indirect buffers, uniform buffers, and other storage for
+non-texture elements that describe what and how to draw. If you&#x27;ve worked with
+OpenGL before, this should all be pretty easy to understand. But I didn&#x27;t, so I
+was confused. If you&#x27;re not sure what all these uses are exactly, don&#x27;t worry,
+I&#x27;ll talk about it more later.&lt;&#x2F;p&gt;
+&lt;p&gt;Images are a bit more complex than buffers. They are one, two, or
+three-dimensional arrays, which can also have mipmaps, a tiling (letting the GPU
+layout the image in a nonlinear manner for more efficient access), and the
+like. Images are accessed through &lt;em&gt;views&lt;&#x2F;em&gt;, which are very similar to buffer
+views, but have some more options of the sort that are convenient if you&#x27;re
+working with... well, images in the colloquial sense, collections of pixels that
+form a picture.&lt;&#x2F;p&gt;
+&lt;p&gt;When images and buffers are created, they aren&#x27;t actually backed by any
+memory. Memory fitting the memory requirements of the resource has to be &lt;em&gt;bound&lt;&#x2F;em&gt;
+to it after the fact and before you actually use the resource.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;the-window-system&quot;&gt;The Window System&lt;&#x2F;h2&gt;
+&lt;p&gt;There&#x27;s no standard way for Vulkan to interact with a window system. This makes
+sense, because there&#x27;s no standard window system, and no cross-platform way to
+interact with them. Instead, there are a set of standard extensions for
+interfacing with all the different window systems that exist across platforms,
+as well one for actually rendering to a window across platforms, once you&#x27;ve
+gotten a handle to one in a platform specific manner. In theory, there could be
+an entirely conforming implementation of Vulkan that provided none of this, and
+didn&#x27;t actually permit you to render to a screen at all. In practice, this is
+extremely unlikely.&lt;&#x2F;p&gt;
+&lt;p&gt;If wrangling a bunch of different platform-specific APIs sounds like a miserable
+thing to do and you just want to get on with writing your app, that&#x27;s good. It
+means you&#x27;re still sane. Fortunately, it&#x27;s not your job to do any of this stuff:
+You should be using an external library like &lt;a href=&quot;https:&#x2F;&#x2F;www.libsdl.org&#x2F;&quot;&gt;SDL2&lt;&#x2F;a&gt; or
+&lt;a href=&quot;https:&#x2F;&#x2F;www.glfw.org&#x2F;&quot;&gt;GLFW&lt;&#x2F;a&gt;. They handle this stuff and a lot of other
+cross-platform concerns for you, probably better than you would have if left to
+your own devices. Personally, I&#x27;ll endorse SDL: It&#x27;s bigger, but it provides
+more utility and it&#x27;s just generally rock-solid. But GLFW is a fine choice too.&lt;&#x2F;p&gt;
+&lt;p&gt;Moving on, the first object you&#x27;ll acquire in order to images onto the screen
+is...&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;the-surface&quot;&gt;The Surface&lt;&#x2F;h3&gt;
+&lt;p&gt;A Vulkan Surface is an abstract representation of a window, your app in
+full-screen, or really anything you can present images to. It has a size, which
+may change over time if it gets resized (and you&#x27;ll need to rebuild parts of
+your pipeline if it changes, so watch out!). You present to a surface (i.e,
+actually put images on the screen) by issuing presentation commands to a queue
+that supports them. Any queue that you can issue graphics commands to probably
+will support such commands, but this isn&#x27;t guaranteed: design around the
+assumption that your app might be on a system where this is not the case.&lt;&#x2F;p&gt;
+&lt;p&gt;You can&#x27;t actually do a whole lot with a surface directly. Most of the time
+you&#x27;ll actually be dealing with...&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;the-swapchain&quot;&gt;The Swapchain&lt;&#x2F;h3&gt;
+&lt;p&gt;The Swapchain is just a collection of images that are controlled and allocated
+by the driver. Different hardware may have different minimum and maximum numbers
+of images required to be in the swapchain. You can request any number in between
+the minimum and maximum (naturally).&lt;&#x2F;p&gt;
+&lt;p&gt;As for why the swapchain exists, it&#x27;s because you can&#x27;t draw to the memory that
+is currently being sent out to the screen. The swapchain provides the extra
+images you&#x27;ll need, and lets you &lt;em&gt;swap&lt;&#x2F;em&gt; between them, changing what&#x27;s on
+screen. You can change how and when this swapping occurs to implement vsync,
+triple-buffering, and even immediate display (which will cause tearing).&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;rendering&quot;&gt;Rendering&lt;&#x2F;h1&gt;
+&lt;p&gt;At last, we arrive at the truly &lt;em&gt;complicated&lt;&#x2F;em&gt; part of the overview, and the most
+complex part of Vulkan itself: Rendering. This only makes sense, rendering is
+the primary focus of Vulkan. But there&#x27;s a lot here, and it&#x27;s pretty
+complicated. Here we go...&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;the-render-pass&quot;&gt;The Render Pass&lt;&#x2F;h2&gt;
+&lt;p&gt;The Render Pass object answers the broad question &amp;quot;what will this rendering
+operation &lt;em&gt;do&lt;&#x2F;em&gt;?&amp;quot; It does not record commands, nor specifics. But it does address
+the generalities: How many resources (dubbed &amp;quot;attachments&amp;quot; in this context) does
+the render pass need? Of what kind? What will it do with them? What state should
+they be in at the start and end of the subpass? Speaking of which Render passes
+may be broken into subpasses, which can have inter-dependencies. This may be
+useful for adding, say, post-processing, doing dynamic lighting, and other cases
+where you will have multiple passes. However, subpasses are sharply limited:
+Work for a given pixel in a subpass on an image that was touched by a prior
+subpass can only read information about &lt;em&gt;that specific pixel&lt;&#x2F;em&gt;. So, for example,
+blur effects cannot be implemented by a subpass.&lt;&#x2F;p&gt;
+&lt;p&gt;Note that not all resources required during rendering are described in the
+render pass. Essentially, only actual outputs are considered. And of course,
+shaders can do essentially arbitrary things, which muddy the waters further. So
+most of the time, the attachments to render pass will be your output color
+buffer, your Z-buffer, and your depth stencil (assuming you&#x27;re using the latter
+two at all..). Also note that the render pass does not specify the particular
+set of attachments to be used in rendering, only what will be done with them and
+how they should be initialized. The object containing the actual attachments to
+bind to the render pass (which are bound at command recording time) is called
+the &lt;em&gt;Frame Buffer&lt;&#x2F;em&gt;. Which given that it&#x27;s where the output of a render will be
+stored is probably technically correct but just &lt;em&gt;feels so wrong&lt;&#x2F;em&gt; when I say it.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;the-pipeline&quot;&gt;The Pipeline&lt;&#x2F;h2&gt;
+&lt;p&gt;If the render pass answers the question of &lt;em&gt;what&lt;&#x2F;em&gt; we&#x27;re doing, the pipeline
+object informs Vulkan of the nitty-gritty of &lt;em&gt;how&lt;&#x2F;em&gt; we&#x27;re doing it. This is one
+massive static object that provides the system with a ton of information about
+how you&#x27;re rendering stuff. What shaders are you using? If you&#x27;re using a depth
+stencil, what are you doing with it? Are you doing backface culling? Using a
+depth clamp? How are you culling? Are you drawing points? lines? triangles?
+Strips? Fans? Do you want to make something about this pipeline configurable at
+render-time? (there are very few things you actually &lt;em&gt;can&lt;&#x2F;em&gt; configure at
+render-time...)? Basically, the pipeline contains all the information about how
+we intend to get from a list of points and a bunch of resources to an image
+onscreen.&lt;&#x2F;p&gt;
+&lt;p&gt;It&#x27;s worth noting that you can absolutely use multiple pipelines when rendering
+a single subpass. In fact, with complex scenes, this may be necessary: If you&#x27;re
+using different shaders or different options for different parts of a scene,
+you&#x27;ll need to use a different pipeline. Creating pipelines is relatively
+expensive, so you should plan for this ahead of time and build all the different
+pipelines you&#x27;ll need as early as you can.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;shaders&quot;&gt;Shaders&lt;&#x2F;h2&gt;
+&lt;p&gt;If you&#x27;re an artist, you might assume shaders control how images are shaded: how
+they look onscreen, light and shadows and all that. That is, in a sense, part of
+the task shaders have, but shaders do a lot more than that.&lt;&#x2F;p&gt;
+&lt;p&gt;What shaders really are is code that runs our GPU. All the parts of the pipeline
+that are &amp;quot;programmable&amp;quot; are controlled by shaders. Shaders control how
+individual pixels are rendered, but they also take input vertices and transform
+them to put them where they&#x27;ll be onscreen. Typically, you&#x27;ll send your models
+to the vertex shader, along with a matrix that will rotate and translate it to
+where it should be in the scene, and have the shader (and thus GPU) handle it,
+rather than working out that positioning on the CPU. The vertex shader also
+handles projection: making images appear according to correct perspective and
+making sure that your FOV setting actually affects what&#x27;s onscreen is partly the
+vertex shader&#x27;s job. And shaders are also responsible for doing texture mapping
+(the fragment shader handles this). On newer GPUs (most of the ones that support
+Vulkan), additional shader stages exist that let you subdivide geometry and even
+add new geometry. This lets you do level-of-detail (LOD) adjustment, changing
+the number of polygons and complexity of a model depending on how far from the
+camera it is.&lt;&#x2F;p&gt;
+&lt;p&gt;In Vulkan, shaders are pre-compiled to a bytecode format called SPIR-V, which
+typically has a .spv file extension. You then create shader module objects from
+the raw bytecode, which can be added to pipelines. Shaders can be written in
+anything that can be compiled to spv, but there aren&#x27;t terribly many languages
+that support this right now. Most commonly (and by tradition) shaders are
+written in GLSL, the OpenGL Shading Language. There are many references and
+guides to learning GLSL online, although not all the information available
+applies to Vulkan.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;descriptors&quot;&gt;Descriptors&lt;&#x2F;h2&gt;
+&lt;p&gt;Descriptors are sort of handles, resource identifiers that let shaders freely
+access that resource. Much like file descriptors.&lt;&#x2F;p&gt;
+&lt;p&gt;You don&#x27;t need descriptors for every kind of resource a shader touches. In
+particular, shader inputs and outputs don&#x27;t require descriptors, so vertex
+buffers being fed to the vertex shader don&#x27;t need a descriptor, and neither do
+the framebuffers that the fragment shader writes to. Essentially, descriptors
+bind uniforms, storage buffers, samplers, and images. Descriptors come in a set,
+which is basically just an array of descriptors: you can&#x27;t create single
+descriptors on your own. You can have multiple descriptor sets if you want. Each
+descriptor in a set has a binding number, and can be referred to uniquely by its
+set number and binding number: This is how the object referenced by the
+descriptor is bound in GLSL (using layout qualifiers). Before creating your
+descriptor set, you&#x27;ll need to created a layout object that describes what will
+be in it. You also must provide information about how many sets you will used
+and how they are laid out to your pipeline when that&#x27;s being created.&lt;&#x2F;p&gt;
+&lt;p&gt;When the time comes to actually create your descriptor set, you can&#x27;t allocate
+it directly: you need to allocate it from a pool object. I forget why you need
+to do this, but I think it has something to do with providing good
+multithreading support. There must be some state involved with creating sets or
+something that the instance needs to track.&lt;&#x2F;p&gt;
+&lt;p&gt;After a descriptor set is created, it has to be written to with information:
+most importantly, what the heck each descriptor in the set is pointing to and
+how big that thing is. Finally, in order to use a descriptor set during drawing,
+you&#x27;ll need to bind it before issuing a draw command during command buffer
+recording. And that&#x27;s more or less all there is to it.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;samplers&quot;&gt;Samplers&lt;&#x2F;h2&gt;
+&lt;p&gt;I casually mentioned samplers above. These are objects that get used in your
+fragment shader. They contain information about how to address textures when
+you&#x27;re mapping them. This is where you can enable and disable bilinear or
+trilinear filtering, specify whether the texture should repeat or not, how much
+(if any) anisotropic filtering to have, how the texture is addressed, LOD
+biases, and in general just about 90% of the information that a user might
+configure in your average PC game options menu.&lt;&#x2F;p&gt;
+&lt;p&gt;Samplers can be passed to the shader on their own, or be linked to an image so
+that they can only be used by that image (this is called a &amp;quot;combined image
+sampler&amp;quot; for reasons that are pretty obvious). Combined imaged samplers might be
+slower than samplers on their own. They also might be faster. The spec does not
+say, although I read a forum post by a guy that says that combined samplers
+perform better on at least one popular manufacturer&#x27;s graphics hardware. This
+wouldn&#x27;t surprise me if it were true: graphics hardware manufacturers
+suck. Especially Intel: friends don&#x27;t let friends use Intel HD graphics.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;commands&quot;&gt;Commands&lt;&#x2F;h2&gt;
+&lt;p&gt;At last we arrive at the big, important part of drawing: commands. Commands are
+the glue that brings everything else together. It&#x27;s commands that move through
+render passes and subpasses, bind descriptors, set push constants, copy data,
+bind the vertex buffers, bind the pipeline, and actually draw whatever piece of
+crap you&#x27;re putting on screen and calling a videogame (If you&#x27;re not writing a
+videogame, my apologies). To be more precise, commands do all the big heavy work
+that happens on the GPU: all the stuff that needs to be submitted to queue, will
+be done asynchronously, and might take a while. (Well, there are also things
+called queries. I won&#x27;t talk about them right now, but they&#x27;re more or less what
+they sound like).&lt;&#x2F;p&gt;
+&lt;p&gt;Commands are packaged up into command buffers, which are what you record a set
+of commands to send to the GPU in, and what you actually send to the queue. Most
+of the time, command buffers can be recorded once and sent as many times as you
+like, although it&#x27;s rare to actually be able to do so, as commands are often
+specific to the actual frame you&#x27;re drawing. Like descriptor sets, command
+buffers aren&#x27;t directly allocated: they&#x27;re allocated from pool
+objects. Something something multithreading.&lt;&#x2F;p&gt;
+&lt;p&gt;In addition to normal command buffers, Vulkan provides something called
+&lt;em&gt;secondary&lt;&#x2F;em&gt; command buffers. These command buffers can&#x27;t be directly submitted,
+but can be called from other command buffers. So if you have a batch of commands
+that only need to be recorded once while the rest of your command buffer will
+need to be rerecorded every frame, these can be helpful.&lt;&#x2F;p&gt;
+&lt;p&gt;Vulkan&#x27;s command buffers are relatively cheap to record compared to their
+equivalents in other APIs, but recording a command buffer should still be
+considered an expensive operation operation.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion?&lt;&#x2F;h1&gt;
+&lt;p&gt;I&#x27;ve now covered almost every object in Vulkan. Not quite all of them: I&#x27;ve
+ignored various nooks and crannies, especially those pertaining to compute (sorry
+GPGPU people, but... admit it, you don&#x27;t actually &lt;em&gt;care&lt;&#x2F;em&gt; about our graphics
+API...). At the very least, I&#x27;ve found it helpful for me. I don&#x27;t know about
+you. I certainly don&#x27;t recommend this as your only resource on Vulkan. The
+Vulkan Tutorial is excellent, even for the C++-averse like me, and the specs
+are more lucid than some I&#x27;ve read (WebAssembly...).&lt;&#x2F;p&gt;
+&lt;p&gt;If I make a part two, I&#x27;ll be talking a bit about computer graphics from first
+principles: annoying math, rasterization, the sort of stuff that carries across
+APIs. Because it&#x27;s been a right headache to understand, so I&#x27;m going to
+rubber-duck the hell out of it.&lt;&#x2F;p&gt;
+</content>
+	</entry>
+	<entry xml:lang="en">
+		<title>Aesthetics, Pain, and You</title>
+		<published>2020-08-05T00:00:00+00:00</published>
+		<updated>2020-08-05T00:00:00+00:00</updated>
+		<link href="https://jjbarr.github.io/blog/aesthetic-pain/" type="text/html"/>
+		<id>https://jjbarr.github.io/blog/aesthetic-pain/</id>
+		<content type="html">&lt;p&gt;So after being poked off into &lt;em&gt;making&lt;&#x2F;em&gt; this website, the next step was to make
+it look good. I may be a proponent of minimalism, but I like
+nice-looking things. If I had a bit less restraint this website would be covered
+in &lt;a href=&quot;https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Fleuron_(typography)&quot;&gt;fleurons&lt;&#x2F;a&gt; (there used to
+be some, but I removed them. Why? 🙙🙚. If you see boxes there instead of leaves,
+then you are why).&lt;&#x2F;p&gt;
+&lt;p&gt;Unfortunately, it seems like crummy tradeoffs are just a part of web design. If
+there&#x27;s a cool feature that neatly solves your problem, then most users probably
+aren&#x27;t running browsers that have it. Heck, this site has a minor dependency on
+you having SVG support in your browser and relies on modern CSS. So while it may
+look like it could have been made in the 90s, Netscape Navigator would choke on
+it. And that&#x27;s a shame, but I don&#x27;t think many people use Netscape
+Navigator anymore. So I&#x27;m not overly concerned.&lt;&#x2F;p&gt;
+&lt;p&gt;Another pain point was the mercury symbol in the horizontal rules. You know,
+this?&lt;&#x2F;p&gt;
+&lt;hr class=&quot;fancy&quot;&#x2F;&gt;
+&lt;p&gt;It turns out cell phones really want to render that as an emoji, complete
+with purple blob border. Which totally ruins the whole aesthetic. I used the
+Unicode VS15 modifier, which asks the renderer not to do that. Will it work? I
+don&#x27;t know. It depends on your phone, or as the case may be, your computer.&lt;&#x2F;p&gt;
+&lt;p&gt;The final irritation I encountered making this website had to do with
+implementing the color scheme. I used
+&lt;a href=&quot;https:&#x2F;&#x2F;ethanschoonover.com&#x2F;solarized&#x2F;&quot;&gt;Solarized&lt;&#x2F;a&gt;, which has been my go-to
+color scheme for use with almost everything for almost a decade now (look, it
+&lt;em&gt;was&lt;&#x2F;em&gt; cool at the time, and I&#x27;m used to it now...). This was not the annoying
+part. The annoying part was that I decided it would be a bright idea to use the
+shiny new &lt;a href=&quot;https:&#x2F;&#x2F;developer.mozilla.org&#x2F;en-US&#x2F;docs&#x2F;Web&#x2F;CSS&#x2F;@media&#x2F;prefers-color-scheme&quot;&gt;prefers-color-scheme&lt;&#x2F;a&gt;
+media query to see whether the user would prefer my website to use a light theme
+or a dark theme. Straightfoward enough... until I went to test it, and
+discovered that by default firefox provided no way to toggle this setting
+without altering your system settings or digging into &lt;code&gt;about:config&lt;&#x2F;code&gt;. There
+isn&#x27;t even a developer debug tool yet, which, fair enough, it&#x27;s still a
+draft. But why is there no option in the options menu?&lt;&#x2F;p&gt;
+&lt;p&gt;Apparently, it&#x27;s because Mozilla&#x27;s been arguing with itself about whether or not
+this should be an option for two years and nobody&#x27;s been motivated enough to
+just get up and do it.&lt;&#x2F;p&gt;
+&lt;p&gt;Jeez, guys. I get the instinct to do it right, but just get it in already. I
+would consider the ability to control an explicitly user-settable option for how
+a website should render to be a fairly fundamental thing for a browser to expose
+to its users.&lt;&#x2F;p&gt;
+&lt;p&gt;So I guess the real moral of this story is that I&#x27;m impatient and sick of
+waiting for features I want to land in software. Like a decent way to integrate
+Rust into a C build. Or &lt;code&gt;offsetof&lt;&#x2F;code&gt; for Rust, which is important for interfacing
+with external libraries. Or the ability to actually gracefully fail to allocate
+memory in Rust...&lt;&#x2F;p&gt;
+&lt;p&gt;Look, I like Rust a lot. I&#x27;d rather be writing Rust than building this
+website. So hopefully, I&#x27;ll be back to doing that soon.&lt;&#x2F;p&gt;
+</content>
+	</entry>
+	<entry xml:lang="en">
+		<title>Hello world!</title>
+		<published>2020-08-04T00:00:00+00:00</published>
+		<updated>2020-08-04T00:00:00+00:00</updated>
+		<link href="https://jjbarr.github.io/blog/first-post/" type="text/html"/>
+		<id>https://jjbarr.github.io/blog/first-post/</id>
+		<content type="html">&lt;p&gt;Welcome to the first post on this very shiny new blog. I&#x27;m finally happy with
+the design after a few hours tweaking it. It&#x27;s elegant, minimalist, and it feels
+pretty good! Mmmm... minimalism. I like minimalism. If this site ever requires
+Javascript, please punch me in the chest.&lt;&#x2F;p&gt;
+&lt;p&gt;Anyways, moving on, you might be wondering what you can expect from this blog in
+the future. That&#x27;s a good question. If I were you, I wouldn&#x27;t expect any sort of
+regular or consistent schedule, but you should expect interesting and irrelevant
+technical asides from a person with no formal qualifications, because that&#x27;s
+what most of this will be. Just... imagine some weird guy screaming at the sky
+outside. Now imagine that person used Emacs and really hated C++ and XML to an
+almost irrational degree. If that person had a blog, it might look a bit like
+this website.&lt;&#x2F;p&gt;
+&lt;p&gt;If that sounds good to you, you can subscribe to my newsfeed. Yes, those are
+still a thing.&lt;&#x2F;p&gt;
+</content>
+	</entry>
+</feed>
