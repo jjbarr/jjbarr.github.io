@@ -49,7 +49,7 @@ the tens place, then the hundreds, and so on. You passed first grade, so I
 probably don't need to tell you that. Base two, binary, also works like this,
 but each place increments by powers of two. So the first place is still the
 ones, the second place is the twos, the third is the fours, and so on. The *n*th
-place is the *2^(n-1)*s place.
+place is the *2^(n-1)*'s place.
 
 Decoding binary is very simple. If there's a one in a given place, add the
 number for that place to the total. Otherwise, don't. At the end, that total is
