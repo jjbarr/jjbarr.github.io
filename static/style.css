@@ -69,17 +69,18 @@ code {
     color: var(--sol-cyan)
 }
 
+
+header h1 h2 h3 h4 h5 h6 {
+    color: var(--sol-emph);
+    font-weight: bold;
+}
+
 header {
     font-size: 3em;
     line-height: 1.1em;
     font-family: sans-serif;
     text-align: center;
     margin: 24px;
-}
-
-header h1 h2 h3 h4 h5 h6 {
-    color: var(--sol-emph);
-    font-weight: bold;
 }
 
 h1.page-title {
