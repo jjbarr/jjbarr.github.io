@@ -2,7 +2,7 @@
 title = "Home"
 +++
 
-Welcome!
+Hi!
 
-You probably want the blog. There's a link up there (although you've no doubt
-noticed that already...). Such is life. 
+There's mostly blog here. I'll let you know if that ever changes, or I put
+something neat here.

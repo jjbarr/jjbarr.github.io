@@ -136,6 +136,11 @@ hr {
     font-style: italic;
 }
 
+img {
+    max-height:100%;
+    max-width: 100%;
+}
+
 /* stolen from Harry Roberts at CSS tricks */
 
 hr.fancy {
@@ -181,14 +186,14 @@ a.icon {
     stroke: var(--sol-red);
 }
 
-.sellout {
-    stroke: var(--sol-green);
-}
-
 .rss {
     stroke: var(--sol-orange);
 }
 
 .rss:hover {
     stroke: var(--sol-emph);
+}
+
+.copyright {
+    font-size: 10px;
 }
