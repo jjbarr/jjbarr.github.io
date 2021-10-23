@@ -9,17 +9,6 @@
     src: url('/fonts/DejaVuSansMono.ttf');
 }
 
-@font-face {
-    font-family: 'DejaVu Math TeX Gyre';
-    src: url('/fonts/DejaVuMathTeXGyre.ttf');
-}
-
-/*math*/
-math {
-    font-family: 'DejaVu Math TeX Gyre';
-    line-height: 1em;
-}
-
 /* Solarized colors */
 :root {
     --sol-bg: #fdf6e3;
