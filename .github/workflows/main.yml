@@ -14,12 +14,13 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
-    name: zbrox/zola-deploy-action
+    name: Publish site
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: zbrox/zola-deploy-action
-      uses: zbrox/zola-deploy-action@master
+    - uses: actions/checkout@3.0.0
+    - name: Deploy Site
+      uses: shalzz/zola-deploy-action@0.17.2
       env:
         TOKEN: ${{ secrets.TOKEN }}
+        BUILD_DIR: .
         PAGES_BRANCH: master
