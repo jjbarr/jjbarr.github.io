@@ -17,7 +17,7 @@ jobs:
     name: Publish site
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.0.0
+    - uses: actions/checkout@v4.0.0
     - name: Deploy Site
       uses: shalzz/zola-deploy-action@v0.17.2
       env:
