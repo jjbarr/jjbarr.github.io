@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
     update_scheme(curscheme, container);
     container.addEventListener("click", (e) => {
         curscheme = curscheme === DARK? LIGHT : DARK;
+        window.localStorage.setItem("prefcolors", curscheme);
         update_scheme(curscheme, container);
     });
 });
