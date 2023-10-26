@@ -1,0 +1,317 @@
+/*fonts*/
+
+@font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 400;
+    src: url('/fonts/IBMPlexMono.woff2') format('woff2');
+}
+
+/*font declarations for Open Sans*/
+
+@font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-stretch: 100%;
+    src: url('/fonts/OpenSans.woff2') format('woff2');
+}
+/* color theming */
+:root {
+    /* tomorrow-day */
+    --tmr-l-bg: #ffffff;
+    --tmr-l-fg: #4d4d4c;
+    --tmr-l-line: #efefef;
+    --tmr-l-sel: #d6d6d6;
+    --tmr-l-com: #8e908c;
+    --tmr-l-red: #c82829;
+    --tmr-l-orange: #f5871f;
+    --tmr-l-yellow: #eab700;
+    --tmr-l-green: #718c00;
+    --tmr-l-aqua: #3e999f;
+    --tmr-l-blue: #4271ae;
+    --tmr-l-purple: #8959a8;
+    /* tomorrow-night */
+    --tmr-d-bg: #1d1f21;
+    --tmr-d-fg: #c5c8c6;
+    --tmr-d-line: #282a2e;
+    --tmr-d-sel: #373b41;
+    --tmr-d-com: #969896;
+    --tmr-d-red: #cc6666;
+    --tmr-d-orange: #de935f;
+    --tmr-d-yellow: #f0c674;
+    --tmr-d-green: #b5bd68;
+    --tmr-d-aqua: #8abeb7;
+    --tmr-d-blue: #81a2be;
+    --tmr-d-purple: #b294bb;
+    /* theme set */
+    --bg: var(--tmr-l-bg);
+    --fg: var(--tmr-l-fg);
+    --line: var(--tmr-l-line);
+    --sel: var(--tmr-l-sel);
+    --com: var(--tmr-l-com);
+    --red: var(--tmr-l-red);
+    --orange: var(--tmr-l-orange);
+    --yellow: var(--tmr-l-yellow);
+    --green: var(--tmr-l-green);
+    --aqua: var(--tmr-l-aqua);
+    --blue: var(--tmr-l-blue);
+    --purple: var(--tmr-l-purple);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: var(--tmr-d-bg);
+        --fg: var(--tmr-d-fg);
+        --line: var(--tmr-d-line);
+        --sel: var(--tmr-d-sel);
+        --com: var(--tmr-d-com);
+        --red: var(--tmr-d-red);
+        --orange: var(--tmr-d-orange);
+        --yellow: var(--tmr-d-yellow);
+        --green: var(--tmr-d-green);
+        --aqua: var(--tmr-d-aqua);
+        --blue: var(--tmr-d-blue);
+        --purple: var(--tmr-d-purple);
+    }
+}
+
+#change-color-scheme {
+    position: fixed;
+    right: 10px;
+    top: 10px;
+    border-radius: 5px;
+}
+
+body {
+    margin: 40px auto;
+    max-width: 85ch;
+    line-height: 1.6em;
+    font-size: 16px;
+    padding: 0 10px;
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: 'Open Sans', sans-serif;
+}
+
+pre code {
+    font-family: 'IBM Plex Mono', monospace;
+    display: inline-block;
+    overflow-x: auto;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--sel);
+    max-width: 100% !important;
+    min-width: 100% !important;
+}
+
+header h1 h2 h3 h4 h5 h6 {
+    font-weight: bold;
+}
+
+header {
+    font-size: 3em;
+    line-height: 1.1em;
+    font-family: 'Open Sans', sans-serif;
+    text-align: center;
+    margin: 24px;
+}
+
+h1.page-title {
+    font-size: 2.5em;
+    line-height: 1.1em;
+}
+
+h1 {
+    font-size: 2em;
+    line-height: 1.1em;
+}
+
+h2 {
+    font-size: 1.5em;
+    line-height: 1.1em;
+}
+
+h3 {
+    font-size: 1.2em;
+    line-height: 1.1em;
+}
+
+pre {
+    padding: 10px;
+    border-radius: 10px;
+}
+
+a:link {
+    color: var(--blue);
+}
+
+a:visited {
+    color: var(--purple);
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+hr {
+    display: block;
+    height: 2pt;
+    border: none;
+    border-color: var(--sel);
+    background-color: var(--sel);
+}
+
+.date {
+    float: right;
+    margin-left: 100%;
+    line-height: 2em;
+    font-style: italic;
+}
+
+img {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+/* stolen from Harry Roberts at CSS tricks */
+
+hr.fancy {
+    overflow: visible; /* For IE (this site will break in ie tho)*/
+    text-align: center;
+}
+
+hr.fancy:after {
+    content: "§";
+    display: inline-block;
+    position: relative;
+    top: -0.5em;
+    font-size: 1.5em;
+    padding: 0 /*0.25em;*/;
+    color: var(--fg);
+    background: var(--sol-bg);
+}
+
+/*footer and icon related*/
+.foot-links {
+    float: right;
+}
+
+a.icon {
+    text-decoration: none;
+}
+
+.feather {
+    width: 24px;
+    height: 24px;
+    stroke: var(--fg);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.mail, .mail.feather {
+    stroke: var(--red);
+}
+
+.mail:hover {
+    stroke: var(--fg);
+}
+
+.rss, .rss.feather {
+    stroke: var(--orange);
+}
+
+.rss:hover {
+    stroke: var(--fg);
+}
+
+.scheme, .scheme.feather {
+    stroke: var(--com);
+}
+
+.scheme:hover {
+    stroke: var(--fg);
+}
+
+.info {
+    font-size: 10px;
+}
+
+/* syntax highlighting */
+
+.z-code {
+    color: var(--fg);
+    background-color: var(--bg);
+}
+
+.z-comment, .z-string.z-quoted.z-double.z-block.z-python {
+    color: var(--com);
+}
+
+.z-variable, .z-support.z-other.z-variable, .z-string.z-other.z-link,
+.z-string.z-regexp, .z-entity.z-name.z-tag, .z-entity.z-other.z-attribute-name,
+.z-meta.z-tag, .z-declaration.z-tag {
+    color: var(--red);
+}
+
+.z-constant.z-numeric, .z-constant.z-language, .z-support.z-constant,
+.z-constant.z-character, .z-variable.z-parameter,
+.z-punctuation.z-section.z-embedded, .z-keyword.z-other.z-unit {
+    color: var(--orange);
+}
+
+.z-string, .z-constant.z-other.z-symbol, .z-entity.z-other.z-inherited-class,
+.z-markup.z-heading {
+    color: var(--green);
+}
+
+.z-string, .z-constant.z-other.z-symbol, .z-entity.z-other.z-inherited-class,
+.z-markup.z-heading {
+    color: var(--aqua);
+}
+
+.z-entity.z-name.z-function, .z-meta.z-function-call, .z-support.z-function,
+.z-keyword.z-other.z-special-method, .z-meta.z-block-level {
+    color: var(--blue);
+}
+
+.z-keyword, .z-storage, .z-storage.z-type {
+    color: var(--purple);
+}
+
+.z-invalid {
+    color: var(--fg);
+    background-color: var(--red);
+}
+
+.z-meta.z-separator {
+    color: var(--fg);
+    background-color: var(--blue);
+}
+
+.z-invalid.z-deprecated {
+    color: var(--fg);
+    background-color: var(--purple);
+}
+
+.z-markup.z-inserted.z-diff, .z-meta.z-diff.z-header.z-to-file {
+    background-color: var(--green);
+}
+
+.z-markup.z-deleted.z-diff, .z-meta.z-diff.z-header.z-from-file {
+    background-color: var(--red);
+}
+
+.z-meta.z-diff.z-header.z-from-file, .z-meta.z-diff.z-header.z-to-file {
+    background-color: var(--blue);
+}
+
+.z-meta.z-diff.z-range {
+    color: var(--aqua);
+    font-style: italic;
+}
