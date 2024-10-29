@@ -11,9 +11,9 @@ base_url = "https://ptnote.dev"
 compile_sass = false
 
 # RSS? Yes please
-generate_feed = true
+generate_feeds = true
 
-feed_filename = "atom.xml"
+feed_filenames = ["atom.xml"]
 
 # Whether to build a search index to be used later on by a JavaScript library
 build_search_index = false

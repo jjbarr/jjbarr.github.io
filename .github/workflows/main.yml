@@ -19,7 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4.0.0
     - name: Deploy Site
-      uses: shalzz/zola-deploy-action@v0.17.2
+      uses: shalzz/zola-deploy-action@v0.19.2
       env:
         TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BUILD_DIR: .
