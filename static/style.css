@@ -230,6 +230,14 @@ a.icon {
     stroke: var(--fg);
 }
 
+.bsky {
+    stroke: var(--blue);
+}
+
+.bsky:hover {
+    stroke: var(--fg);
+}
+
 .scheme, .scheme.feather {
     stroke: var(--com);
 }
