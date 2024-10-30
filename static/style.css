@@ -1,10 +1,10 @@
 /*fonts*/
 
 @font-face {
-    font-family: 'IBM Plex Mono';
+    font-family: 'Fairfax HD';
     font-style: normal;
     font-weight: 400;
-    src: url('/fonts/IBMPlexMono.woff2') format('woff2');
+    src: url('/fonts/FairfaxHD.woff2') format('woff2');
 }
 
 /*font declarations for Open Sans*/
@@ -95,7 +95,7 @@ body {
 }
 
 pre code {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Fairfax HD', monospace;
     display: inline-block;
     overflow-x: auto;
     border-radius: 5px;
