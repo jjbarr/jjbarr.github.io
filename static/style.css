@@ -111,11 +111,25 @@ header h1 h2 h3 h4 h5 h6 {
 }
 
 header {
+    color: var(--green);
     font-size: 3em;
     line-height: 1.1em;
     font-family: 'Open Sans', sans-serif;
     text-align: center;
-    margin: 24px;
+}
+
+.title-spona {
+    color: var(--green);
+    white-space: normal;
+    font-family: 'Fairfax HD';
+    font-size: 1.9em;
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.title-link {
+    text-decoration: none;
 }
 
 h1.page-title {
