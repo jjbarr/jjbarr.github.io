@@ -7,15 +7,13 @@
     src: url('/fonts/FairfaxHD.woff2') format('woff2');
 }
 
-/*font declarations for Open Sans*/
-
 @font-face {
-    font-family: 'Open Sans';
+    font-family: 'Chicago FLF';
     font-style: normal;
     font-weight: 400;
-    font-stretch: 100%;
-    src: url('/fonts/OpenSans.woff2') format('woff2');
+    src: url('/fonts/ChicagoFLF.woff2') format('woff2');
 }
+
 /* color theming */
 :root {
     /* tomorrow-day */
@@ -91,7 +89,7 @@ body {
     padding: 0 10px;
     background-color: var(--bg);
     color: var(--fg);
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Chicago FLF', sans-serif;
 }
 
 pre code {
@@ -106,7 +104,8 @@ pre code {
     min-width: 100% !important;
 }
 
-header h1 h2 h3 h4 h5 h6 {
+header, h1, h2, h3, h4, h5, h6 {
+    font-family: 'Chicago FLF', sans-serif;
     font-weight: bold;
 }
 
@@ -114,7 +113,6 @@ header {
     color: var(--green);
     font-size: 3em;
     line-height: 1.1em;
-    font-family: 'Open Sans', sans-serif;
     text-align: center;
 }
 
