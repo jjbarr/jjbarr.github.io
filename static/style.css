@@ -237,10 +237,19 @@ img {
     max-width: 100%;
 }
 
-a > img {
-    padding: 0;
+ul.section-list {
+    list-style: none;
+    padding-left: 0;
 }
 
+ul.section-list > li {
+    padding-left: 1.4em;
+    text-indent: -1.4em;
+    &:before {
+        content: "💬";
+        padding-right: 5px;
+    }
+}
 /* stolen from Harry Roberts at CSS tricks */
 
 hr.fancy {
