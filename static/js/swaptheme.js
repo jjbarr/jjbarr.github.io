@@ -1,24 +1,34 @@
 "use strict";
-const THEME = "tmr";
-const LIGHT = "l";
-const DARK = "d";
+const THEME = "sel";
+const LIGHT = "w";
+const DARK = "b";
 const ICON = {
-    "l": "moon",
-    "d": "sun"
+    "w": "moon",
+    "b": "sun"
 };
 const COLORS = [
-    "fg",
-    "bg",
-    "line",
-    "sel",
-    "com",
+    "bg0",
+    "bg1",
+    "bg2",
+    "dim0",
+    "fg0",
+    "fg1",
     "red",
     "orange",
     "yellow",
     "green",
-    "aqua",
     "blue",
-    "purple"
+    "cyan",
+    "magenta",
+    "violet",
+    "br-red",
+    "br-orange",
+    "br-yellow",
+    "br-green",
+    "br-blue",
+    "br-cyan",
+    "br-magenta",
+    "br-violet",
 ];
 
 function update_scheme(curscheme, container) {
