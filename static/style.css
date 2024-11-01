@@ -237,6 +237,10 @@ img {
     max-width: 100%;
 }
 
+a > img {
+    padding: 0;
+}
+
 /* stolen from Harry Roberts at CSS tricks */
 
 hr.fancy {

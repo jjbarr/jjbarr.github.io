@@ -50,6 +50,11 @@ document.addEventListener("DOMContentLoaded", (e) => {
         || (window.matchMedia("(prefers-color-scheme: dark)").matches
             ? DARK
             : LIGHT);
+    if (curscheme !== DARK && curscheme !== LIGHT) {
+        curscheme =
+            (window.matchMedia("(prefers-color-scheme: dark)").matches
+             ? DARK : LIGHT);
+    }
     let container = document.getElementById("change-color-scheme");
     update_scheme(curscheme, container);
     container.addEventListener("click", (e) => {
