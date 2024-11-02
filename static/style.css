@@ -237,6 +237,17 @@ img {
     max-width: 100%;
 }
 
+.badges {
+    text-align: center;
+    img {
+        image-rendering: pixelated;
+        image-rendering: -webkit-optimize-contrast;
+    }
+    a {
+        color: var(--bg0);
+    }
+}
+
 ul.section-list {
     list-style: none;
     padding-left: 0;
