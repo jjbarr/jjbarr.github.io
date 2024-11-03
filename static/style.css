@@ -5,6 +5,7 @@
     font-style: normal;
     font-weight: 400;
     src: url('/fonts/FairfaxHD.woff2') format('woff2');
+    font-display: swap;
 }
 
 @font-face {
@@ -12,6 +13,7 @@
     font-style: normal;
     font-weight: 400;
     src: url('/fonts/ChicagoFLF.woff2') format('woff2');
+    font-display: swap;
 }
 
 /* color theming */
