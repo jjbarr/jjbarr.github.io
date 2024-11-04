@@ -176,6 +176,12 @@ header {
     margin-bottom: 10px;
 }
 
+div.umaring {
+    color: var(--red);
+    text-align: center;
+    a {color: var(--red);}
+}
+
 .title-link {
     text-decoration: none;
 }
