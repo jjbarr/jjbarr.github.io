@@ -202,6 +202,13 @@ code {
     background-color: var(--bg1);
 }
 
+blockquote {
+    border-left: 3px solid var(--bg1);
+    margin-left: 5px;
+    padding-left: 10px;
+    
+}
+
 pre code {
     display: inline-block;
     overflow-x: auto;

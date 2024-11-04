@@ -4,3 +4,11 @@
   <use xlink:href="/fonticons/feather.svg#{{name}}"/>
 </svg>
 {% endmacro icon %}
+
+{% macro badges(path) %}
+{% set data = load_data(path=path) %}
+{% for badge in data.badges %}
+<a href="{{badge.link}}">
+  <img loading="lazy" src="{{badge.image}}" alt="{{badge.alt}}"></img></a>
+{% endfor %}
+{% endmacro badges %}
