@@ -1,4 +1,21 @@
 /*fonts*/
+@font-face {
+    font-family: 'Overpass';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    font-optical-sizing: auto;
+    src: url('/fonts/overpass.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Overpass';
+    font-style: italic;
+    font-weight: 100 900;
+    font-display: swap;
+    font-optical-sizing: auto;
+    src: url('/fonts/overpass-italic.woff2') format('woff2');
+}
 
 @font-face {
     font-family: 'Fairfax HD';
@@ -9,11 +26,12 @@
 }
 
 @font-face {
-    font-family: 'Chicago FLF';
+    font-familiy: 'Noto Color Emoji';
     font-style: normal;
-    font-weight: 400;
-    src: url('/fonts/ChicagoFLF.woff2') format('woff2');
+    font-weight: 300 700;
     font-display: swap;
+    src: local('Noto Color Emoji'),
+         url('/fonts/color-emoji.woff2') format('woff2');
 }
 
 /* color theming */
@@ -183,12 +201,13 @@ body[data-colorscheme="1"] {
 body {
     margin: 40px auto;
     max-width: 85ch;
-    line-height: 1.6em;
+    line-height: 1.4em;
     font-size: 16px;
+    font-weight: 600;
     padding: 0 10px;
     background-color: var(--bg0);
     color: var(--fg0);
-    font-family: 'Chicago FLF', sans-serif;
+    font-family: 'Overpass', serif, 'Noto Color Emoji';
 }
 
 code {
@@ -203,10 +222,9 @@ code {
 }
 
 blockquote {
-    border-left: 3px solid var(--bg1);
-    margin-left: 5px;
-    padding-left: 10px;
-    
+    border-left: 5px solid var(--bg1);
+    margin-left: 0px;
+    padding-left: 25px;
 }
 
 pre code {
@@ -217,7 +235,6 @@ pre code {
 }
 
 header, h1, h2, h3, h4, h5, h6 {
-    font-family: 'Chicago FLF', sans-serif;
     font-weight: bold;
 }
 
@@ -285,6 +302,48 @@ nav {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+}
+
+details {
+    position: relative;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-color: var(--dim0);
+    background-color: var(--bg0);
+    &:hover {background-color: var(--bg1);}
+}
+
+details.info summary:after{
+    text-align: end;
+    position: absolute;
+    right: 10px;
+    content: "💬";
+    font-size: 1.2em;
+}
+
+details.warning {
+    border-color: var(--orange);
+    summary {
+        color: var(--orange);
+        &:after {
+            position: absolute;
+            right: 10px;
+            content: "⚠";
+            font-size: 1em;
+            color: var(--orange);
+        }
+    }
+}
+
+details[open] summary {
+    border-bottom: solid;
+    border-width: 1px;
+    border-color: var(--dim0);
 }
 
 hr {
@@ -392,7 +451,7 @@ a.icon {
     stroke: var(--fg0);
 }
 
-.scheme, .scheme.feather {
+.scheme {
     stroke: var(--fg1);
 }
 
