@@ -1,20 +1,10 @@
 /*fonts*/
 @font-face {
-    font-family: 'Overpass';
+    font-family: 'Constructium';
     font-style: normal;
-    font-weight: 100 900;
     font-display: swap;
     font-optical-sizing: auto;
-    src: url('/fonts/overpass.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'Overpass';
-    font-style: italic;
-    font-weight: 100 900;
-    font-display: swap;
-    font-optical-sizing: auto;
-    src: url('/fonts/overpass-italic.woff2') format('woff2');
+    src: url('/fonts/Constructium.woff2') format('woff2');
 }
 
 @font-face {
@@ -207,11 +197,11 @@ body {
     padding: 0 10px;
     background-color: var(--bg0);
     color: var(--fg0);
-    font-family: 'Overpass', serif, 'Noto Color Emoji';
+    font-family: 'Constructium', serif, 'Noto Color Emoji';
 }
 
 code {
-    font-family: 'Fairfax HD', monospace;
+    font-family: 'Fairfax HD', monospace, 'Noto Color Emoji';
     border-radius: 5px;
     border-style: solid;
     border-width: 1px;
@@ -242,6 +232,7 @@ header {
     color: var(--green);
     font-size: 3em;
     line-height: 1.1em;
+    font-weight: 900;
     text-align: center;
 }
 
@@ -268,6 +259,7 @@ div.umaring {
 h1.page-title {
     font-size: 2.5em;
     line-height: 1.1em;
+    font-weight: 750;
 }
 
 h1 {
@@ -302,6 +294,7 @@ nav {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+    font-size: 1.1em;
 }
 
 details {
@@ -377,19 +370,18 @@ img {
     }
 }
 
-ul.section-list {
-    list-style: none;
-    padding-left: 0;
-}
-
-ul.section-list > li {
-    padding-left: 1.4em;
-    text-indent: -1.4em;
-    &:before {
-        content: "💬";
-        padding-right: 5px;
+ul {
+    list-style-type: "→  ";
+    padding-left: 20px;
+    li::marker {
+        color: var(--blue);
     }
 }
+
+ul.section-list {
+    list-style-type: "💬";
+}
+
 /* stolen from Harry Roberts at CSS tricks */
 
 hr.fancy {
@@ -411,6 +403,7 @@ hr.fancy:after {
 /*footer and icon related*/
 .foot-links {
     float: right;
+    padding-left: 10px;
 }
 
 a.icon {
@@ -461,6 +454,7 @@ a.icon {
 
 .info {
     font-size: 10px;
+    line-height: 1.2em;
 }
 
 
