@@ -1,16 +1,14 @@
 /*fonts*/
 @font-face {
     font-family: 'Constructium';
-    font-style: normal;
+    font-synthesis: weight style small-caps;
     font-display: swap;
-    font-optical-sizing: auto;
     src: url('/fonts/Constructium.woff2') format('woff2');
 }
 
 @font-face {
     font-family: 'Fairfax HD';
     font-style: normal;
-    font-weight: 400;
     src: url('/fonts/FairfaxHD.woff2') format('woff2');
     font-display: swap;
 }
@@ -192,7 +190,6 @@ body {
     max-width: 100ch;
     line-height: 1.4em;
     font-size: 16px;
-    font-weight: 600;
     padding: 0 10px;
     background-color: var(--bg0);
     color: var(--fg0);
