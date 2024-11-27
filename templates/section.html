@@ -4,7 +4,7 @@
 <section id="index">
 <h1>{{section.title}}</h1>
 {{section.content | safe}}
-<hr class="fancy">
+<hr/>
 <ul class="section-list">
   {% for page in section.pages %}
   <li>{{page.date}}: <a href="{{page.permalink}}">{{page.title}}</a>

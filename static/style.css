@@ -185,12 +185,11 @@ body[data-colorscheme="1"] {
     position: fixed;
     right: 10px;
     top: 10px;
-    border-radius: 5px;
 }
 
 body {
     margin: 40px auto;
-    max-width: 85ch;
+    max-width: 100ch;
     line-height: 1.4em;
     font-size: 16px;
     font-weight: 600;
@@ -198,6 +197,11 @@ body {
     background-color: var(--bg0);
     color: var(--fg0);
     font-family: 'Constructium', serif, 'Noto Color Emoji';
+}
+
+p, blockquote, details, pre {
+    margin-bottom: 8px;
+    margin-top: 8px;
 }
 
 code {
@@ -217,15 +221,26 @@ blockquote {
     padding-left: 25px;
 }
 
-pre code {
-    display: inline-block;
-    overflow-x: auto;
-    max-width: 100% !important;
-    min-width: 100% !important;
+pre {
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-left: 0;
+    
+    code {
+        display: inline-block;
+        overflow-x: scroll;
+        border-radius: 10px;
+        max-width: 100%;
+        min-width: 100%;
+        padding: 5px;
+    }
 }
 
 header, h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
+    margin-bottom: 12px;
+    margin-top: 12px;
+    color: var(--fg1);
 }
 
 header {
@@ -259,7 +274,7 @@ div.umaring {
 h1.page-title {
     font-size: 2.5em;
     line-height: 1.1em;
-    font-weight: 750;
+    margin-bottom: 0;
 }
 
 h1 {
@@ -275,11 +290,6 @@ h2 {
 h3 {
     font-size: 1.2em;
     line-height: 1.1em;
-}
-
-pre {
-    padding: 10px;
-    border-radius: 10px;
 }
 
 a:link {
@@ -311,7 +321,7 @@ details {
     &:hover {background-color: var(--bg1);}
 }
 
-details.info summary:after{
+details.inform summary:after{
     text-align: end;
     position: absolute;
     right: 10px;
@@ -348,10 +358,14 @@ hr {
 }
 
 .date {
-    float: right;
-    margin-left: 100%;
+    width: 100%;
+    display: inline-block;
+    text-align: end;
     line-height: 2em;
     font-style: italic;
+    color: var(--fg1);
+    padding: 0;
+    margin: 0;
 }
 
 img {
@@ -380,24 +394,6 @@ ul {
 
 ul.section-list {
     list-style-type: "💬";
-}
-
-/* stolen from Harry Roberts at CSS tricks */
-
-hr.fancy {
-    overflow: visible; /* For IE (this site will break in ie tho)*/
-    text-align: center;
-}
-
-hr.fancy:after {
-    content: "§";
-    display: inline-block;
-    position: relative;
-    top: -0.5em;
-    font-size: 1.5em;
-    padding: 0 /*0.25em;*/;
-    color: var(--fg);
-    background: var(--sol-bg);
 }
 
 /*footer and icon related*/
@@ -455,9 +451,8 @@ a.icon {
 .info {
     font-size: 10px;
     line-height: 1.2em;
+    padding-bottom: 10px;
 }
-
-
 
 /* syntax highlighting */
 
