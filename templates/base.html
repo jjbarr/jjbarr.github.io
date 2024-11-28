@@ -13,6 +13,8 @@
     {% elif section is defined %}
     <meta name="description" content="{{section.description}}" />
     {% endif %}
+    <meta name="fediverse:creator" content="@thothxv@mastodon.social">
+    <link rel="me" href="at://{{config.extra.bsky_did}}">
     <link rel="stylesheet" href="/style.css" />
     <link rel="author" href="/humans.txt" />
     <link rel="preload" href="/fonts/Constructium.woff2"
@@ -68,15 +70,19 @@
       <a href="/blog">blog</a>
       <a href="/projects">projects</a>
     </nav>
-    <hr/>
+    <hr class="bold"/>
     <div id="change-color-scheme"></div>
     <div id="outer-content">
       {% block content %} {% endblock %}
     </div>
-    <hr/>
+    <hr class="bold"/>
     <footer>
       <span class="foot-links">
-        <a class="icon" href="https://bsky.app/profile/thoth.ptnote.dev">
+        <a class="icon" rel="me" href="https://mastodon.social/@thothxv">
+          <span class="fedi" aria-label="Fediverse" title="Fediverse">⁂</span>
+        </a>
+        <a class="icon" rel="me"
+           href="https://bsky.app/profile/{{config.extra.bsky_did}}">
           {{macros::icon(name="at-sign", title="BlueSky", classes="bsky")}}
         </a>
         <a class="icon" href="mailto:jjbarr@ptnote.dev">

@@ -1,7 +1,6 @@
 /*fonts*/
 @font-face {
     font-family: 'Constructium';
-    font-synthesis: weight style small-caps;
     font-display: swap;
     src: url('/fonts/Constructium.woff2') format('woff2');
 }
@@ -101,7 +100,6 @@
         --br-violet: var(--sel-w-br-violet);
     }
 }
-
 @media (prefers-color-scheme: dark) {
     :root {
         --bg0: var(--sel-b-bg0);
@@ -244,7 +242,6 @@ header {
     color: var(--green);
     font-size: 3em;
     line-height: 1.1em;
-    font-weight: 900;
     text-align: center;
 }
 
@@ -272,6 +269,13 @@ h1.page-title {
     font-size: 2.5em;
     line-height: 1.1em;
     margin-bottom: 0;
+    border-bottom: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    border-bottom: dashed;
+    border-color: var(--bg2);
+    border-width: 1px;
 }
 
 h1 {
@@ -348,17 +352,21 @@ details[open] summary {
 
 hr {
     display: block;
-    height: 2pt;
     border: none;
-    border-color: var(--bg2);
+    height: 1px;
+    background-color: var(--bg2);
+}
+
+hr.bold {
+    height: 2px;
     background-color: var(--bg2);
 }
 
 .date {
     width: 100%;
-    display: inline-block;
+    display: block;
     text-align: end;
-    line-height: 2em;
+    line-height: 1em;
     font-style: italic;
     color: var(--fg1);
     padding: 0;
@@ -393,20 +401,65 @@ ul.section-list {
     list-style-type: "💬";
 }
 
+.footnote-definition {
+    font-size: 0.8em;
+    line-height: 1.3em;
+    p {
+        display: inline;
+    }
+}
+
+div.section-load-comments {
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#load-comments {
+    color: var(--blue);
+    text-decoration: none;
+    padding: 10px;
+    border: solid;
+    border-width: 1px;
+    border-radius: 30px;
+    &:hover {
+        background-color: var(--bg1);
+        color: var(--fg0);
+    }
+}
+
 /*footer and icon related*/
 .foot-links {
     float: right;
     padding-left: 10px;
 }
 
+.show-comments, .show-comments.feather {
+    stroke: var(--blue);
+    vertical-align: -7px;
+}
+
 a.icon {
     text-decoration: none;
+}
+
+span.fedi {
+    height: 24px;
+    width: 24px;
+    font-size: 24px;
+    vertical-align: 4px;
+    color: var(--violet);
+    &:hover {
+        color: var(--fg0);
+    }
 }
 
 .feather {
     width: 24px;
     height: 24px;
-    stroke: var(--fg);
+    stroke: var(--fg0);
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -500,7 +553,7 @@ a.icon {
 
 .z-invalid.z-deprecated {
     color: var(--fg);
-    background-color: var(--purple);
+    background-color: var(--violet);
 }
 
 .z-markup.z-inserted.z-diff, .z-meta.z-diff.z-header.z-to-file {
