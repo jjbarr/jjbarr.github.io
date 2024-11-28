@@ -30,3 +30,4 @@ highlight_theme = "css"
 
 [extra]
 # Put all your custom variables here
+bsky_did = "did:plc:yjgg5pqittc74ld5b2f5gms4"
