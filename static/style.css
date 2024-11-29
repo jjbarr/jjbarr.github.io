@@ -409,10 +409,12 @@ ul.section-list {
     }
 }
 
-div.section-load-comments {
+div#comments {
     width: 100%;
-    display: inline-block;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     margin-top: 10px;
     margin-bottom: 10px;
 }
@@ -427,33 +429,22 @@ div.section-load-comments {
     &:hover {
         background-color: var(--bg1);
         color: var(--fg0);
+        &> .show-comments {
+            stroke: var(--fg0);
+        }
     }
 }
 
-/*footer and icon related*/
-.foot-links {
-    float: right;
-    padding-left: 10px;
+#load-comments.error {
+    color: var(--red);
+    &> .show-comments {
+        stroke: var(--red);
+    }
 }
 
 .show-comments, .show-comments.feather {
     stroke: var(--blue);
     vertical-align: -7px;
-}
-
-a.icon {
-    text-decoration: none;
-}
-
-span.fedi {
-    height: 24px;
-    width: 24px;
-    font-size: 24px;
-    vertical-align: 4px;
-    color: var(--violet);
-    &:hover {
-        color: var(--fg0);
-    }
 }
 
 .feather {
@@ -466,11 +457,42 @@ span.fedi {
     fill: none;
 }
 
+/*prebadge*/
+.pre-badge {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.foot-info {
+    font-size: 10px;
+    line-height: 1.2em;
+    padding-bottom: 10px;
+}
+
+.foot-links {
+    flex-shrink: 0;
+}
+
+span.fedi {
+    height: 24px;
+    width: 24px;
+    font-size: 24px;
+    vertical-align: 4px;
+    color: var(--violet);
+    &:hover , &:focus {
+        color: var(--fg0);
+    }
+}
+
+a.icon {
+    text-decoration: none;
+}
+
 .mail, .mail.feather {
     stroke: var(--red);
 }
 
-.mail:hover {
+.mail:hover, a:focus > .mail {
     stroke: var(--fg0);
 }
 
@@ -478,7 +500,7 @@ span.fedi {
     stroke: var(--orange);
 }
 
-.rss:hover {
+.rss:hover, a:focus > .rss {
     stroke: var(--fg0);
 }
 
@@ -486,22 +508,8 @@ span.fedi {
     stroke: var(--blue);
 }
 
-.bsky:hover {
+.bsky:hover, a:focus > .bsky {
     stroke: var(--fg0);
-}
-
-.scheme {
-    stroke: var(--fg1);
-}
-
-.scheme:hover {
-    stroke: var(--fg0);
-}
-
-.info {
-    font-size: 10px;
-    line-height: 1.2em;
-    padding-bottom: 10px;
 }
 
 /* syntax highlighting */
