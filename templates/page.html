@@ -2,6 +2,15 @@
 
 
 {% block extra_headers %}
+<meta property="og:title" content="{{page.title}}" />
+<meta property="og:description" content="{{page.description}}" />
+<meta property="og:site_name" content="{{config.title}}" />
+<meta property="og:type" content="article" />
+<meta property="og:image" content="{{config.base_url}}/images/ptnote.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="88" />
+<meta property="og:image:height" content="31" />
+<meta property="og:image:alt" content="PT_NOTE" />
 {% if config.extra.bsky_did and page.extra.bsky_rkey %}
 <script src="/js/comments.js"></script>
 {% endif %}
@@ -9,12 +18,15 @@
 
 
 {% block content %}
-<h1 class="page-title">{{page.title}}</h1>
-<span class=date>{{page.date}}</span>
+<header>
+  <h1 class="page-title">{{page.title}}</h1>
+  <div class="page-desc">{{page.description}}</div>
+  <time datetime="{{page.date}}" class="date">{{page.date}}</span>
+</header>
 <hr/>
-<article id="page">
+<main id="page">
   {{page.content | safe}}
-</article>
+</main>
 
 {% if config.extra.bsky_did and page.extra.bsky_rkey %}
 <hr/>

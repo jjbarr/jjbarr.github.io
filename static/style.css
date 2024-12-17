@@ -238,7 +238,7 @@ header, h1, h2, h3, h4, h5, h6 {
     color: var(--fg1);
 }
 
-header {
+header.site-title {
     color: var(--green);
     font-size: 3em;
     line-height: 1.1em;
@@ -270,6 +270,10 @@ h1.page-title {
     line-height: 1.1em;
     margin-bottom: 0;
     border-bottom: none;
+}
+
+.page-desc {
+    font-style: italic;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -422,7 +426,10 @@ div#comments {
 #load-comments {
     color: var(--blue);
     text-decoration: none;
-    padding: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
     border: solid;
     border-width: 1px;
     border-radius: 30px;
