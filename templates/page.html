@@ -11,9 +11,6 @@
 <meta property="og:image:width" content="88" />
 <meta property="og:image:height" content="31" />
 <meta property="og:image:alt" content="PT_NOTE" />
-{% if config.extra.bsky_did and page.extra.bsky_rkey %}
-<script src="/js/comments.js"></script>
-{% endif %}
 {% endblock extra_headers %}
 
 
@@ -27,19 +24,4 @@
 <main id="page">
   {{page.content | safe}}
 </main>
-
-{% if config.extra.bsky_did and page.extra.bsky_rkey %}
-<hr/>
-<div id="comments">
-<a id="load-comments"
-   href="https://bsky.app/profile/{{config.extra.bsky_did}}/{{page.extra.bsky_rkey}}"
-   data-atref="at://{{config.extra.bsky_did}}/app.bsky.feed.post/{{page.extra.bsky_rkey}}"
-   target="_blank">
-  {{macros::icon(name="message-square", title="See Comments",
-  classes="show-comments")}}
-  See Comments
-</a>
-</div>
-{% endif %}
-
 {% endblock content %}
