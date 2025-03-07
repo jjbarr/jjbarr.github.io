@@ -82,3 +82,7 @@
   link = "https://jordane.day"
   image = "/images/jordan.gif"
   alt = "Jordan"
+[[badges]]
+  link = "https://nostalgicforthe.net"
+  image = "/images/swillion.gif"
+  alt = "Swillion"
