@@ -10,7 +10,6 @@ base_url = "https://ptnote.dev"
 # Whether to automatically compile all Sass files in the sass directory
 compile_sass = false
 
-# RSS? Yes please
 generate_feeds = true
 
 feed_filenames = ["atom.xml"]

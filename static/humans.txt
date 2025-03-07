@@ -2,13 +2,10 @@ This website was created by me, Joshua Barrett. I did it all myself except the
 parts I didn't do.
 
 This website uses Cole Bemis's Feather SVG icon set. The monospace font used is
-Kreative Korp's Fairfax HD, which is also used for the toki pona. All other text
-is rendered in Chicago FLF, a public domain recreation of Chicago TTF by Robin
-Casady and others. Chicago TTF was developed by Bigelow and Holmes, based on the
-original Chicago by Susan Kare.
+Kreative Korp's Fairfax HD, which is also used for the toki pona. The 
+non-monospaced text is rendered using Kreative Korp's Constructium.
 
 The myriad of 88x31 GIF buttons were largely found across the internet in
 various archives of these badges. The textfiles.org archive is one of the larger
 ones if you want to find some yourself.
 
-The abuse of greatness is when it disjoins remorse from power.
