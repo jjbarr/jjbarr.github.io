@@ -1,2 +1,3 @@
 #!/bin/bash
-zola build -o public && rsync -av public/ ptnote:~/public && rm -rf public
+
+rm -rf public && zola build -o public && rsync -av public/ ptnote:~/public && rm -rf public
