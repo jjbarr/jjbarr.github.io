@@ -1,15 +1,78 @@
 /*fonts*/
+
 @font-face {
-    font-family: 'Constructium';
+    font-family: 'asterism';
+    font-style: normal;
+    font-weight: normal;
     font-display: swap;
-    src: url('/fonts/Constructium.woff2') format('woff2');
+    src: url('/fonts/asterism.woff2') format('woff2');
 }
 
 @font-face {
-    font-family: 'Fairfax HD';
+    font-family: 'Go Mono';
     font-style: normal;
-    src: url('/fonts/FairfaxHD.woff2') format('woff2');
+    font-weight: normal;
     font-display: swap;
+    src: local('Go Mono Regular'), url('/fonts/Go-Mono.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Go Mono';
+    font-style: normal;
+    font-weight: bold;
+    font-display: swap;
+    src: local('Go Mono Bold'), url('/fonts/Go-Mono-Bold.woff2')
+                                   format('woff2');
+}
+
+@font-face {
+    font-family: 'Go Mono';
+    font-style: italic;
+    font-weight: normal;
+    font-display: swap;
+    src: local('Go Mono Italic'), url('/fonts/Go-Mono-Italic.woff2')
+                                   format('woff2');
+}
+
+@font-face {
+    font-family: 'Go Mono';
+    font-style: italic;
+    font-weight: bold;
+    font-display: swap;
+    src: local('Go Mono Bold Italic'), url('/fonts/Go-Mono-Bold-Italic.woff2')
+                                          format('woff2');
+}
+
+@font-face {
+    font-family: 'ETbb';
+    font-style: normal;
+    font-weight: normal;
+    font-display: swap;
+    src: url('/fonts/ETbb-Regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'ETbb';
+    font-style: normal;
+    font-weight: bold;
+    font-display: swap;
+    src: url('/fonts/ETbb-Bold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'ETbb';
+    font-style: italic;
+    font-weight: normal;
+    font-display: swap;
+    src: url('/fonts/ETbb-Italic.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'ETbb';
+    font-style: italic;
+    font-weight: bold;
+    font-display: swap;
+    src: url('/fonts/ETbb-BoldItalic.woff2') format('woff2');
 }
 
 @font-face {
@@ -186,26 +249,23 @@ body[data-colorscheme="1"] {
 body {
     margin: 40px auto;
     max-width: 100ch;
-    line-height: 1.4em;
+    line-height: 1.45em;
     font-size: 16px;
     padding: 0 10px;
     background-color: var(--bg0);
     color: var(--fg0);
-    font-family: 'Constructium', serif, 'Noto Color Emoji';
-}
-
-p, blockquote, details, pre {
-    margin-bottom: 8px;
-    margin-top: 8px;
+    font-family: 'ETbb', serif, 'Noto Color Emoji';
 }
 
 code {
-    font-family: 'Fairfax HD', monospace, 'Noto Color Emoji';
+    font-family: 'Go Mono', monospace, 'Noto Color Emoji';
+    font-size: 0.9em;
     border-radius: 5px;
     border-style: solid;
     border-width: 1px;
     padding-left: 5px;
     padding-right: 5px;
+    line-height: 1em;
     border-color: var(--dim0);
     background-color: var(--bg1);
 }
@@ -233,8 +293,6 @@ pre {
 
 header, h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
-    margin-bottom: 12px;
-    margin-top: 12px;
     color: var(--fg1);
 }
 
@@ -245,11 +303,11 @@ header.site-title {
     text-align: center;
 }
 
-.title-spona {
+.subtitle {
     color: var(--green);
     white-space: normal;
-    font-family: 'Fairfax HD';
-    font-size: 1.9em;
+    font-family: 'Go Mono';
+    font-size: 1.2em;
     text-align: center;
     margin-top: 5px;
     margin-bottom: 10px;
@@ -288,7 +346,7 @@ h1 {
 }
 
 h2 {
-    font-size: 1.5em;
+    font-size: 1.8em;
     line-height: 1.1em;
 }
 
@@ -443,6 +501,7 @@ span.fedi {
     height: 24px;
     width: 24px;
     font-size: 24px;
+    font-family: 'asterism';
     vertical-align: 4px;
     color: var(--violet);
     &:hover , &:focus {

@@ -12,3 +12,16 @@
   <img loading="lazy" src="{{badge.image}}" alt="{{badge.alt}}"></img></a>
 {% endfor %}
 {% endmacro badges %}
+
+
+{% macro gentoc(headers) %}
+{% for header in headers %}
+<li> <a href="{{header.permalink | safe}}">{{header.title}}</a>
+  {% if header.children %}
+  <ul>
+    {{ self::gentoc(headers=header.children) }}
+  </ul>
+  {% endif %}
+</li>
+{% endfor %}
+{% endmacro gentoc %}
