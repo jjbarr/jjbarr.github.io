@@ -248,7 +248,7 @@ body[data-colorscheme="1"] {
 
 body {
     margin: 40px auto;
-    max-width: 100ch;
+    max-width: 90ch;
     line-height: 1.45em;
     font-size: 16px;
     padding: 0 10px;
@@ -265,7 +265,7 @@ code {
     border-width: 1px;
     padding-left: 5px;
     padding-right: 5px;
-    line-height: 1em;
+    line-height: 1.4em;
     border-color: var(--dim0);
     background-color: var(--bg1);
 }
@@ -276,11 +276,17 @@ blockquote {
     padding-left: 25px;
 }
 
+p {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 pre {
     margin-left: 0px;
     margin-right: 0px;
     padding-left: 0;
-    
+    margin-top: 0px;
+    margin-bottom: 0px;
     code {
         display: inline-block;
         overflow-x: scroll;
@@ -292,6 +298,7 @@ pre {
 }
 
 header, h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 10px;
     font-weight: bold;
     color: var(--fg1);
 }
