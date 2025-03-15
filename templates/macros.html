@@ -8,8 +8,8 @@
 {% macro badges(path) %}
 {% set data = load_data(path=path) %}
 {% for badge in data.badges %}
-<a href="{{badge.link}}">
-  <img loading="lazy" src="{{badge.image}}" alt="{{badge.alt}}"></img></a>
+<a href="{{badge.link | safe}}">
+  <img loading="lazy" src="{{badge.image | safe}}" alt="{{badge.alt}}"/></a>
 {% endfor %}
 {% endmacro badges %}
 
