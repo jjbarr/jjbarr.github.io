@@ -1,6 +1,7 @@
 +++
 title = "Location is not Identity"
 description = "The instance is the wrong structure."
+draft = true
 +++
 
 One thing I heard a lot during the early days of the post-election Bluesky

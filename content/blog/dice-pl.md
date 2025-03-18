@@ -1,6 +1,7 @@
 +++
 title = "Dice."
 description = "With apologies to Vi Hart"
+draft = true
 +++
 
 [So you're me and you're in compilers
