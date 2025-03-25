@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>PT_NOTE</title>
+    <subtitle>Some Items of Minimal Interest</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://ptnote.dev/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://ptnote.dev"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2023-10-25T00:00:00+00:00</updated>
+    <id>https://ptnote.dev/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Website Refresh</title>
+        <published>2023-10-25T00:00:00+00:00</published>
+        <updated>2023-10-25T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://ptnote.dev/blog/refresh/"/>
+        <id>https://ptnote.dev/blog/refresh/</id>
+        
+        <content type="html" xml:base="https://ptnote.dev/blog/refresh/">&lt;p&gt;I love Solarized, but over time I&#x27;ve begun to feel like it&#x27;s a bad fit for a
+website. It just felt... wrong. So I changed the color scheme to
+&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;chriskempson&#x2F;tomorrow-theme&quot;&gt;Tomorrow&lt;&#x2F;a&gt;. If you have
+Javascript enabled, you should now have the option to change between dark mode
+and light mode, and if you &lt;em&gt;don&#x27;t&lt;&#x2F;em&gt; then the theme will be chosen based on your
+system preferences.&lt;&#x2F;p&gt;
+&lt;p&gt;In addition, I&#x27;ve just generally overhauled things. Syntax highlighting now uses
+the same colors as the rest of the website, there&#x27;s a better homepage and a
+better about page, there&#x27;s a projects page where I put the things I&#x27;m interested
+in, and in general I&#x27;ve made it so that I can show this website to people
+without feeling horribly embarrassed by it.&lt;&#x2F;p&gt;
+&lt;p&gt;As a rule, this site is where I put me talking about technical content, and
+between college burnout and general laziness, that means it&#x27;s been pretty empty
+for a long time. I don&#x27;t expect that to continue going forward.&lt;&#x2F;p&gt;
+&lt;p&gt;(Feel free to laugh if it&#x27;s been six months and there are no other posts here,
+by the way. That&#x27;s funny.)&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>
