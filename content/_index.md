@@ -1,10 +1,7 @@
 +++
-title = "Home"
+title = ".note.home"
 +++
 
-I'm an unemployed CS graduate slowly losing my mind. Sometimes I [write](/blog) about things 
-that interest me, like arcane system internals, historical nonsense, random hacks, and arbitrary 
-garbage. Expect nothing.
-
-One day, I aspire to do something interesting.
-
+Welcome to my humble abode upon this here internet. Take a look around. There's
+not a lot here, but if anything is of interest to you, it's probably my
+[writing](/blog).

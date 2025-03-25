@@ -1,5 +1,5 @@
 +++
-title = "Blog"
+title = ".note.blog"
 sort_by = "date"
 +++
 

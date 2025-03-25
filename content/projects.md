@@ -1,5 +1,5 @@
 +++
-title = "Projects"
+title = ".note.projects"
 description = "Some of the things I've done"
 +++
 
